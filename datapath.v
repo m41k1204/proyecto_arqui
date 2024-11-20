@@ -59,7 +59,7 @@ module datapath (
 	wire [110:0] InputWriteBack;
 	
 	 
-	ff1to1 #(32) instrReg(
+	ff1to1 #(32) FetchToDecodeReg(
 	      .i(InstrF),
 	      .j(InstrD),
 	      .clk(clk)
@@ -70,7 +70,7 @@ module datapath (
 	assign OutputDecode[95:64] = ExtImm;
 	assign OutputDecode[99:96] = InstrD[15:12];
 	
-	ff1to1 #(100) DecodeRegister(
+	ff1to1 #(100) DecodeToExecuteReg(
 	       .i(OutputDecode),
 	       .j(InputExecute),
 	       .clk(clk)
@@ -85,7 +85,7 @@ module datapath (
 	assign OutputExecute[63:32] = WriteDataE;
 	assign OutputExecute[67:64] = InputExecute[99:96];
 	
-	ff1to1 # (110) MemoryRegister(
+	ff1to1 # (110) ExecuteToMemoryReg(
 	   .i(OutputExecute),
 	   .j(InputMemory),
 	   .clk(clk)
@@ -98,7 +98,7 @@ module datapath (
 	assign OutputMemory[63:32] = ALUOutM;
 	assign OutputMemory[67:64] = InputMemory[67:64];
 	
-	ff1to1 # (110) WriteBackRegister (
+	ff1to1 # (110) MemoryToWriteBackReg (
 	   .i(OutputMemory),
 	   .j(InputWriteBack),
 	   .clk(clk)

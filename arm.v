@@ -30,13 +30,13 @@ module arm (
 		.Instr(Instr[31:12]),
 		.ALUFlags(ALUFlags),
 		.RegSrc(RegSrc),
-		.RegWrite(RegWrite),
+		.RegWriteW(RegWrite),
 		.ImmSrc(ImmSrc),
-		.ALUSrc(ALUSrc),
-		.ALUControl(ALUControl),
-		.MemWrite(MemWrite),
-		.MemtoReg(MemtoReg),
-		.PCSrc(PCSrc)
+		.ALUSrcE(ALUSrc),
+		.ALUControlE(ALUControl),
+		.MemWriteM(MemWrite),
+		.MemtoRegW(MemtoReg),
+		.PCSrcW(PCSrc)
 	);
 	datapath dp(
 		.clk(clk),
