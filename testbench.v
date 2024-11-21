@@ -1,3 +1,5 @@
+`include "top.v"
+`timescale 1ns/1ns
 
 module testbench;
 	reg clk;

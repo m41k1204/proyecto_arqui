@@ -1,5 +1,3 @@
-`timescale 1ns / 1ps
-
 module ff1to1(
     
     input wire [WIDTH - 1:0] i,

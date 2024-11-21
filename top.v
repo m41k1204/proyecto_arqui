@@ -1,3 +1,7 @@
+`include "arm.v"
+`include "imem.v"
+`include "dmem.v"
+
 module top (
 	clk,
 	reset,

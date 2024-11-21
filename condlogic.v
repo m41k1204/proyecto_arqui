@@ -1,3 +1,6 @@
+`include "flopenr.v"
+`include "condcheck.v"
+
 module condlogic (
 	clk,
 	reset,

@@ -1,3 +1,11 @@
+`include "ff1to1.v"
+`include "mux2.v"
+`include "flopr.v"
+`include "adder.v"
+`include "regfile.v"
+`include "extend.v"
+`include "alu.v"
+
 module datapath (
 	clk,
 	reset,
@@ -28,7 +36,6 @@ module datapath (
 	output wire [31:0] PC;
 	input wire [31:0] InstrF;
 	wire [31:0] InstrD;
-	wire [31:0] ALUResultE;
 	output wire [31:0] ALUOutM;
 	output wire [31:0] WriteDataM;
 	wire [31:0] WriteData;
@@ -41,8 +48,8 @@ module datapath (
 	wire [31:0] ResultW;
 	wire [3:0] RA1;
 	wire [3:0] RA2;
-	wire [110:0] OutputDecode;
-	wire [110:0] InputExecute;
+	wire [99:0] OutputDecode;
+	wire [99:0] InputExecute;
 	
 	wire [31:0] SrcAE;
 	wire [31:0] ExtImmE;
@@ -51,11 +58,11 @@ module datapath (
 	wire [3:0] WA3E;
 	wire [31:0] ALUResultE;
 	
-	wire [110:0] OutputExecute ;
-	wire [110:0] InputMemory ;
+	wire [67:0] OutputExecute;
+	wire [67:0] InputMemory;
 	
-	wire [110:0] OutputMemory;
-	wire [110:0] InputWriteBack;
+	wire [67:0] OutputMemory;
+	wire [67:0] InputWriteBack;
 	
 	 
 	ff1to1 #(32) FetchToDecodeReg(
@@ -86,7 +93,7 @@ module datapath (
 	assign OutputExecute[63:32] = WriteDataE;
 	assign OutputExecute[67:64] = InputExecute[99:96];
 	
-	ff1to1 # (110) ExecuteToMemoryReg(
+	ff1to1 #(68) ExecuteToMemoryReg(
 	   .i(OutputExecute),
 	   .j(InputMemory),
 	   .clk(clk),
@@ -100,7 +107,7 @@ module datapath (
 	assign OutputMemory[63:32] = ALUOutM;
 	assign OutputMemory[67:64] = InputMemory[67:64];
 	
-	ff1to1 # (110) MemoryToWriteBackReg (
+	ff1to1 #(68) MemoryToWriteBackReg (
 	   .i(OutputMemory),
 	   .j(InputWriteBack),
 	   .clk(clk),

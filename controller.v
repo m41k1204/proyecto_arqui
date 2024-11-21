@@ -1,3 +1,7 @@
+`include "ff1to1.v"
+`include "decode.v"
+`include "condlogic.v"
+
 module controller (
 	clk,
 	reset,
@@ -29,7 +33,7 @@ module controller (
 
 	wire CondExE;
 	wire Branch;
-	wire Flags;
+	wire [3:0] Flags;
 
 	wire PCSrcE;
 	wire RegWriteE;
@@ -39,6 +43,8 @@ module controller (
 	wire BranchE;
 	output wire ALUSrcE;
 	wire [1:0] FlagWriteE;
+	wire [3:0] CondE;
+	wire [3:0] FlagsE;
 
 	wire PCSrcM;
 	wire RegWriteM;
@@ -155,6 +161,6 @@ module controller (
 		//.RegWrite(RegWrite),
 		//.MemWrite(MemWrite)
 		.CondEx(CondExE),
-		.Flags(Flags)
+		.Flags(FlagsE)
 	);
 endmodule
