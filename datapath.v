@@ -21,7 +21,11 @@ module datapath (
 	InstrF,
 	ALUOutM,
 	WriteDataM,
-	ReadData
+	ReadData,
+	Match_1E_M,
+    Match_1E_W,
+    Match_2E_M,
+    Match_2E_W
 );
 	input wire clk;
 	input wire reset;
@@ -47,9 +51,12 @@ module datapath (
 	wire [31:0] ResultW;
 	wire [3:0] RA1;
 	wire [3:0] RA2;
-	wire [99:0] OutputDecode;
-	wire [99:0] InputExecute;
+	wire [107:0] OutputDecode;
+	wire [107:0] InputExecute;
 	
+	
+	wire [3:0] RA1E;
+	wire [3:0] RA2E;
 	wire [31:0] SrcAE;
 	wire [31:0] ExtImmE;
 	wire [31:0] SrcBE;
@@ -62,8 +69,13 @@ module datapath (
 	
 	wire [67:0] OutputMemory;
 	wire [67:0] InputWriteBack;
-	
-	 
+		
+	output wire Match_1E_M,
+    output wire Match_1E_W,
+    output wire Match_2E_M,
+    output wire Match_2E_W
+
+
 	ff1to1 #(32) FetchToDecodeReg(
 	      .i(InstrF),
 	      .j(InstrD),
@@ -75,8 +87,12 @@ module datapath (
 	assign OutputDecode[63:32] = WriteData;
 	assign OutputDecode[95:64] = ExtImm;
 	assign OutputDecode[99:96] = InstrD[15:12];
-	
-	ff1to1 #(100) DecodeToExecuteReg(
+	assign OutputDecode[103:100] = RA1;
+	assign OutputDecode[107:104] = RA2;
+
+
+
+	ff1to1 #(108) DecodeToExecuteReg(
 	       .i(OutputDecode),
 	       .j(InputExecute),
 	       .clk(clk),
@@ -87,6 +103,13 @@ module datapath (
 	assign WriteDataE = InputExecute[63:32];
 	assign ExtImmE = InputExecute[95:64];
 	assign WA3E = InputExecute[99:96];
+	assign RA1E = InputExecute[103:100];
+	assign RA2E = InputExecute[107:104];
+
+	// logica para los Match Signals
+
+
+
 	
 	assign OutputExecute[31:0] = ALUResultE;
 	assign OutputExecute[63:32] = WriteDataE;
