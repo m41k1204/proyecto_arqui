@@ -42,7 +42,6 @@ module datapath (
 	input wire [31:0] ReadData;
 	wire [31:0] PCNext;
 	wire [31:0] PCPlus4;
-	wire [31:0] PCPlus8;
 	wire [31:0] ExtImm;
 	wire [31:0] SrcA;
 	wire [31:0] ResultW;
