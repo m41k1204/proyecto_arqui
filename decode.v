@@ -51,9 +51,9 @@ module decode (
 				4'b0010: ALUControl = 4'b0001;
 				4'b0000: ALUControl = 4'b0010;
 				4'b1100: ALUControl = 4'b0011;
-				4'b1100: ALUControl = 4'b0111;
-				4'b1100: ALUControl = 4'b0110;
-				4'b1100: ALUControl = 4'b0100;
+				4'b1000: ALUControl = 4'b0111;
+				4'b1001: ALUControl = 4'b0110;
+				4'b1010: ALUControl = 4'b0100;
 				default: ALUControl = 4'bxxxx;
 			endcase
 			FlagW[1] = Funct[0] & ~ALUControl[2];
