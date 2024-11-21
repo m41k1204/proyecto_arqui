@@ -23,7 +23,7 @@ module controller (
 	output wire [1:0] RegSrc;
 	output wire [1:0] ImmSrc;
 	wire ALUSrc;
-	wire [1:0] ALUControl;
+	wire [3:0] ALUControl;
 	wire MemWrite;
 	wire MemtoReg;
 	wire [1:0] FlagWrite;
@@ -39,7 +39,7 @@ module controller (
 	wire RegWriteE;
 	wire MemToRegE;
 	wire MemWriteE;
-	output wire [1:0] ALUControlE;
+	output wire [3:0] ALUControlE;
 	wire BranchE;
 	output wire ALUSrcE;
 	wire [1:0] FlagWriteE;
@@ -55,8 +55,8 @@ module controller (
 	output wire RegWriteW;
 	output wire MemtoRegW;
 
-	wire [17:0] OutputDecode;
-	wire [17:0] InputExecute;
+	wire [20:0] OutputDecode;
+	wire [20:0] InputExecute;
 	wire [3:0] OutputExecute;
 	wire [3:0] InputMemory;
 	wire [2:0] OutputMemory;
@@ -91,14 +91,14 @@ module controller (
 	assign OutputDecode [1] = RegWriteD;
 	assign OutputDecode [2] = MemtoReg;
 	assign OutputDecode [3] = MemWrite;
-	assign OutputDecode [5:4] = ALUControl;
-	assign OutputDecode [6] = Branch;
-	assign OutputDecode [7] = ALUSrc;
-	assign OutputDecode [9:8] = FlagWrite;
-	assign OutputDecode [13:10] = InstrD[31:28];
-	assign OutputDecode [17:14] = Flags;
+	assign OutputDecode [7:4] = ALUControl;
+	assign OutputDecode [8] = Branch;
+	assign OutputDecode [9] = ALUSrc;
+	assign OutputDecode [11:10] = FlagWrite;
+	assign OutputDecode [15:12] = InstrD[31:28];
+	assign OutputDecode [19:16] = Flags;
 	
-	ff1to1 #(18) DecodeToExecuteReg(
+	ff1to1 #(21) DecodeToExecuteReg(
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
@@ -109,12 +109,12 @@ module controller (
 	assign RegWriteE = InputExecute[1];
 	assign MemToRegE = InputExecute[2];
 	assign MemWriteE = InputExecute[3];
-	assign ALUControlE = InputExecute[5:4];
-	assign BranchE = InputExecute[6];
-	assign ALUSrcE = InputExecute[7];
-	assign FlagWriteE = InputExecute[9:8];
-	assign CondE = InputExecute[13:10];
-	assign FlagsE = InputExecute[17:14];
+	assign ALUControlE = InputExecute[7:4];
+	assign BranchE = InputExecute[8];
+	assign ALUSrcE = InputExecute[9];
+	assign FlagWriteE = InputExecute[11:10];
+	assign CondE = InputExecute[15:12];
+	assign FlagsE = InputExecute[19:16];
 
 	assign OutputExecute[0] = (PCSrcE & CondExE) | (BranchE & CondExE);
 	assign OutputExecute[1] = RegWriteE & CondExE;
