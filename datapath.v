@@ -38,7 +38,6 @@ module datapath (
 	wire [31:0] PCPlus8;
 	wire [31:0] ExtImm;
 	wire [31:0] SrcA;
-	wire [31:0] SrcB;
 	wire [31:0] ResultW;
 	wire [3:0] RA1;
 	wire [3:0] RA2;
@@ -62,7 +61,8 @@ module datapath (
 	ff1to1 #(32) FetchToDecodeReg(
 	      .i(InstrF),
 	      .j(InstrD),
-	      .clk(clk)
+	      .clk(clk),
+	      .reset(reset)
 	);
 	
 	assign OutputDecode[31:0] = SrcA;
@@ -73,7 +73,8 @@ module datapath (
 	ff1to1 #(100) DecodeToExecuteReg(
 	       .i(OutputDecode),
 	       .j(InputExecute),
-	       .clk(clk)
+	       .clk(clk),
+	       .reset(reset)
 	);
 	
 	assign SrcAE = InputExecute[31:0];
@@ -88,7 +89,8 @@ module datapath (
 	ff1to1 # (110) ExecuteToMemoryReg(
 	   .i(OutputExecute),
 	   .j(InputMemory),
-	   .clk(clk)
+	   .clk(clk),
+       .reset(reset)
 	);
 	
 	assign ALUOutM = InputMemory[31:0];
@@ -101,7 +103,8 @@ module datapath (
 	ff1to1 # (110) MemoryToWriteBackReg (
 	   .i(OutputMemory),
 	   .j(InputWriteBack),
-	   .clk(clk)
+	   .clk(clk),
+       .reset(reset)
 	);
 	
 	mux2 #(32) pcmux(
@@ -119,7 +122,7 @@ module datapath (
 	adder #(32) pcadd1(
 		.a(PC),
 		.b(32'b100),
-		.y(PCPlus8)
+		.y(PCPlus4)
 	);
 	
 	mux2 #(4) ra1mux(
@@ -134,14 +137,20 @@ module datapath (
 		.s(RegSrc[1]),
 		.y(RA2)
 	);
+	
+	wire [3:0] WA3W;
+	assign WA3W = InputWriteBack[67:64];
+	//assign WA3W = 4'b0010;
+	
+	
 	regfile rf(
 		.clk(clk),
 		.we3(RegWrite),
 		.ra1(RA1),
 		.ra2(RA2),
-		.wa3(InputWriteBack[67:64]),
+		.wa3(WA3W),
 		.wd3(ResultW),
-		.r15(PCPlus8),
+		.r15(PCPlus4),
 		.rd1(SrcA),
 		.rd2(WriteData)
 	);

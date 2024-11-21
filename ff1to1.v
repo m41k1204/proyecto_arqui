@@ -1,14 +1,19 @@
 `timescale 1ns / 1ps
 
 module ff1to1(
-    input wire  i,
-    output wire j,
-    input wire clk
+    
+    input wire [WIDTH - 1:0] i,
+    output wire [WIDTH - 1:0] j,
+    input wire clk,
+    input wire reset
     );
     
-    reg temp;
-    always @ (posedge clk) 
-        temp <= i;
+    parameter WIDTH = 8;
+    
+    reg [WIDTH - 1:0] temp;
+    always @ (posedge clk)
+        if(reset) temp <= 0;
+        else temp <= i;
         
     assign j = temp;
 

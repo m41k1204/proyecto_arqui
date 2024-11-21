@@ -50,9 +50,9 @@ module arm (
 		.PCSrc(PCSrc),
 		.ALUFlags(ALUFlags),
 		.PC(PC),
-		.Instr(Instr),
-		.ALUResult(ALUResult),
-		.WriteData(WriteData),
+		.InstrF(Instr),
+		.ALUOutM(ALUResult),
+		.WriteDataM(WriteData),
 		.ReadData(ReadData)
 	);
 endmodule
