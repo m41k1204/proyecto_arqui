@@ -5,6 +5,7 @@
 `include "regfile.v"
 `include "extend.v"
 `include "alu.v"
+`include "mux4.v"
 
 module datapath (
 	clk,
@@ -19,6 +20,8 @@ module datapath (
 	ALUFlags,
 	PC,
 	InstrF,
+	ForwardAE, 
+	ForwardBE,
 	ALUOutM,
 	WriteDataM,
 	ReadData,
@@ -53,8 +56,16 @@ module datapath (
 	wire [3:0] RA2;
 	wire [107:0] OutputDecode;
 	wire [107:0] InputExecute;
+
+	input wire [1:0] ForwardAE;
+	input wire [1:0] ForwardBE;
 	
-	
+	output wire Match_1E_M;
+    output wire Match_1E_W;
+    output wire Match_2E_M;
+    output wire Match_2E_W;
+
+
 	wire [3:0] RA1E;
 	wire [3:0] RA2E;
 	wire [31:0] SrcAE;
@@ -63,6 +74,8 @@ module datapath (
 	wire [31:0] WriteDataE;
 	wire [3:0] WA3E;
 	wire [31:0] ALUResultE;
+
+	wire [3:0] WA3M;
 	
 	wire [67:0] OutputExecute;
 	wire [67:0] InputMemory;
@@ -70,10 +83,6 @@ module datapath (
 	wire [67:0] OutputMemory;
 	wire [67:0] InputWriteBack;
 		
-	output wire Match_1E_M,
-    output wire Match_1E_W,
-    output wire Match_2E_M,
-    output wire Match_2E_W
 
 
 	ff1to1 #(32) FetchToDecodeReg(
@@ -99,17 +108,17 @@ module datapath (
 	       .reset(reset)
 	);
 	
-	assign SrcAE = InputExecute[31:0];
-	assign WriteDataE = InputExecute[63:32];
 	assign ExtImmE = InputExecute[95:64];
 	assign WA3E = InputExecute[99:96];
 	assign RA1E = InputExecute[103:100];
 	assign RA2E = InputExecute[107:104];
 
 	// logica para los Match Signals
-
-
-
+	assign Match_1E_M = (RA1E == WA3M);
+	assign Match_1E_W = (RA1E == WA3W);
+	assign Match_2E_M = (RA1E == WA3M);
+	assign Match_2E_W = (RA1E == WA3W);
+	
 	
 	assign OutputExecute[31:0] = ALUResultE;
 	assign OutputExecute[63:32] = WriteDataE;
@@ -124,10 +133,11 @@ module datapath (
 	
 	assign ALUOutM = InputMemory[31:0];
 	assign WriteDataM = InputMemory[63:32];
+	assign WA3M = InputMemory[67:64];
 	
 	assign OutputMemory[31:0] = ReadData;
 	assign OutputMemory[63:32] = ALUOutM;
-	assign OutputMemory[67:64] = InputMemory[67:64];
+	assign OutputMemory[67:64] = WA3M;
 	
 	ff1to1 #(68) MemoryToWriteBackReg (
 	   .i(OutputMemory),
@@ -200,6 +210,23 @@ module datapath (
 		.s(ALUSrc),
 		.y(SrcBE)
 	);
+
+	mux4 forwardsrcamux(
+		.d0(InputExecute[31:0]),
+		.d1(ResultW),
+		.d2(ALUOutM),
+		.s(ForwardAE),
+		.y(SrcAE)
+	);
+
+	mux4 forwardsrcbmux(
+		.d0(InputExecute[63:32]),
+		.d1(ResultW),
+		.d2(ALUOutM),
+		.s(ForwardBE),
+		.y(WriteDataE)
+	);
+
 	alu alu(
 		SrcAE,
 		SrcBE,
