@@ -20,18 +20,20 @@ module datapath (
 	ALUFlags,
 	PC,
 	InstrF,
-	ForwardAE, 
-	ForwardBE,
 	ALUOutM,
 	WriteDataM,
 	ReadData,
+	ForwardAE, 
+	ForwardBE,
 	Match_1E_M,
     Match_1E_W,
     Match_2E_M,
     Match_2E_W,
 	StallF,
 	StallD, 
-	FlushE
+	FlushE,
+	FlushD,
+	BranchTakenE
 );
 	input wire clk;
 	input wire reset;
@@ -60,12 +62,14 @@ module datapath (
 	wire [107:0] OutputDecode;
 	wire [107:0] InputExecute;
 
+	wire [31:0] PC_;
 	input wire [1:0] ForwardAE;
 	input wire [1:0] ForwardBE;
-
+	input wire BranchTakenE;
 	input wire StallF; 
 	input wire StallD; 
     input wire FlushE;
+	input wire FlushD;
 	
 	output wire Match_1E_M;
     output wire Match_1E_W;
@@ -100,7 +104,7 @@ module datapath (
 	      .clk(clk),
 	      .reset(reset),
 		  .enable(StallF),
-		  .clear(1'b0)
+		  .clear(FlushD)
 	);
 	
 	assign OutputDecode[31:0] = SrcA;
@@ -172,6 +176,14 @@ module datapath (
 		.s(PCSrc),
 		.y(PCNext)
 	);
+
+	mux2 #(32) branchmux(
+		.d0(PCNext),
+		.d1(ALUResultE),
+		.s(BranchTakenE),
+		.y(PC_)
+	);
+
 	flopr #(32) pcreg(
 		.clk(clk),
 		.reset(reset),

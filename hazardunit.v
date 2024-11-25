@@ -10,20 +10,28 @@ module hazardunit(
     input wire Match_2E_M,
     input wire Match_2E_W,
     input wire Match_12D_E,
+    input wire PCSrcD,
+    input wire PCSrcE,
+    input wire PCSrcM,
+    input wire PCSrcW,
+    input wire BranchTakenE,
     output reg [1:0] ForwardAE,
     output reg [1:0] ForwardBE,
     output wire StallF,
     output wire StallD,
-    output wire FlushE
-
+    output wire FlushE,
+    output wire FlushD
 );
 
 wire LDRstall;
+wire PCWrPendingF;
 
+assign PCWrPendingF = PCSrcD + PCSrcE + PCSrcM;
 assign LDRstall = Match_12D_E & MemToRegE;
-assign StallF = LDRstall;
+assign StallF = LDRstall || PCWrPendingF;
 assign StallD = LDRstall;
-assign FlushE = LDRstall;
+assign FlushE = LDRstall || BranchTakenE;
+assign FlushD = PCWrPendingF || PCSrcW || BranchTakenE;
 
 always @(*) begin
     if (Match_1E_M & RegWriteM)         

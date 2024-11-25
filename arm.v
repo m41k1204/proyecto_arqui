@@ -41,6 +41,15 @@ module arm (
     wire StallF;
     wire StallD;
     wire FlushE;
+	wire BranchTakenE;
+	wire FlushD;
+
+	wire PCSrcD;
+	wire PCSrcE;
+	wire PCSrcM;
+	wire PCSrcW;
+
+
 
 	controller c(
 		.clk(clk),
@@ -55,7 +64,8 @@ module arm (
 		.MemWriteM(MemWrite),
 		.MemtoRegW(MemtoReg),
 		.PCSrcW(PCSrc),
-		.MemToRegE(MemToRegE)
+		.MemToRegE(MemToRegE),
+		.BranchTakenE(BranchTakenE)
 	);
 	datapath dp(
 		.clk(clk),
@@ -72,7 +82,18 @@ module arm (
 		.InstrF(Instr),
 		.ALUOutM(ALUResult),
 		.WriteDataM(WriteData),
-		.ReadData(ReadData)
+		.ReadData(ReadData),
+		.ForwardAE(ForwardAE), 
+		.ForwardBE(ForwardBE),
+		.Match_1E_M(Match_1E_M),
+		.Match_1E_W(Match_1E_W),
+		.Match_2E_M(Match_2E_M),
+		.Match_2E_W(Match_2E_W),
+		.StallF(StallF),
+		.StallD(StallD), 
+		.FlushE(FlushE),
+		.FlushD(FlushD),
+		.BranchTakenE(BranchTakenE)
 	);
 
 	hazardunit hz(
@@ -85,10 +106,16 @@ module arm (
     	.Match_2E_M(Match_2E_M),
     	.Match_2E_W(Match_2E_W),
     	.Match_12D_E(Match_12D_E),
-    	.ForwardAE(ForwardAE),
+    	.PCSrcD(PCSrcD),
+		.PCSrcE(PCSrcE),
+		.PCSrcM(PCSrcM),
+		.PCSrcW(PCSrcW),
+		.BranchTakenE(BranchTakenE),
+		.ForwardAE(ForwardAE),
     	.ForwardBE(ForwardBE),
     	.StallF(StallF),
     	.StallD(StallD),
-    	.FlushE(FlushE)
+    	.FlushE(FlushE),
+		.FlushD(FlushD)
 	);
 endmodule

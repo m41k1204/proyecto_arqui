@@ -15,7 +15,8 @@ module controller (
 	MemWriteM,
 	MemtoRegW,
 	PCSrcW,
-	MemToRegE
+	MemToRegE,
+	BranchTakenE
 
 );
 	input wire clk;
@@ -51,6 +52,8 @@ module controller (
 	wire PCSrcM;
 	wire RegWriteM;
 	wire MemToRegM;
+
+	output wire BranchTakenE;
 	output wire MemWriteM;
 
 	output wire PCSrcW;
@@ -104,7 +107,7 @@ module controller (
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
-       .reset(reset)
+        .reset(reset)
 	);
 
 	assign PCSrcE = InputExecute[0];
@@ -118,7 +121,8 @@ module controller (
 	assign CondE = InputExecute[15:12];
 	assign FlagsE = InputExecute[19:16];
 
-	assign OutputExecute[0] = (PCSrcE & CondExE) | (BranchE & CondExE);
+	assign BranchTakenE = (BranchE & CondExE);
+	assign OutputExecute[0] = (PCSrcE & CondExE) ;
 	assign OutputExecute[1] = RegWriteE & CondExE;
 	assign OutputExecute[2] = MemToRegE;
 	assign OutputExecute[3] = MemWriteE & CondExE;
