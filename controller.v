@@ -14,7 +14,9 @@ module controller (
 	ALUControlE,
 	MemWriteM,
 	MemtoRegW,
-	PCSrcW
+	PCSrcW,
+	MemToRegE
+
 );
 	input wire clk;
 	input wire reset;
@@ -37,7 +39,7 @@ module controller (
 
 	wire PCSrcE;
 	wire RegWriteE;
-	wire MemToRegE;
+	output wire MemToRegE;
 	wire MemWriteE;
 	output wire [3:0] ALUControlE;
 	wire BranchE;

@@ -3,14 +3,27 @@
 module hazardunit(
     input wire clk,
     input wire RegWriteW, 
-    input wire RegWriteM,  
+    input wire RegWriteM,
+    input wire MemToRegE,  
     input wire Match_1E_M,
     input wire Match_1E_W,
     input wire Match_2E_M,
     input wire Match_2E_W,
+    input wire Match_12D_E,
     output reg [1:0] ForwardAE,
-    output reg [1:0] ForwardBE
+    output reg [1:0] ForwardBE,
+    output wire StallF,
+    output wire StallD,
+    output wire FlushE
+
 );
+
+wire LDRstall;
+
+assign LDRstall = Match_12D_E & MemToRegE;
+assign StallF = LDRstall;
+assign StallD = LDRstall;
+assign FlushE = LDRstall;
 
 always @(*) begin
     if (Match_1E_M & RegWriteM)         

@@ -27,6 +27,21 @@ module arm (
 	wire [1:0] RegSrc;
 	wire [1:0] ImmSrc;
 	wire [3:0] ALUControl;
+
+	wire RegWriteW;
+    wire RegWriteM;
+    wire MemToRegE;  
+    wire Match_1E_M;
+    wire Match_1E_W;
+    wire Match_2E_M;
+    wire Match_2E_W;
+    wire Match_12D_E;
+    reg [1:0] ForwardAE;
+    reg [1:0] ForwardBE;
+    wire StallF;
+    wire StallD;
+    wire FlushE;
+
 	controller c(
 		.clk(clk),
 		.reset(reset),
@@ -39,7 +54,8 @@ module arm (
 		.ALUControlE(ALUControl),
 		.MemWriteM(MemWrite),
 		.MemtoRegW(MemtoReg),
-		.PCSrcW(PCSrc)
+		.PCSrcW(PCSrc),
+		.MemToRegE(MemToRegE)
 	);
 	datapath dp(
 		.clk(clk),
@@ -57,5 +73,22 @@ module arm (
 		.ALUOutM(ALUResult),
 		.WriteDataM(WriteData),
 		.ReadData(ReadData)
+	);
+
+	hazardunit hz(
+		.clk(clk),
+		.RegWriteW(RegWriteW), 
+    	.RegWriteM(RegWriteM),
+    	.MemToRegE(MemToRegE),  
+    	.Match_1E_M(Match_1E_M),
+    	.Match_1E_W(Match_1E_W),
+    	.Match_2E_M(Match_2E_M),
+    	.Match_2E_W(Match_2E_W),
+    	.Match_12D_E(Match_12D_E),
+    	.ForwardAE(ForwardAE),
+    	.ForwardBE(ForwardBE),
+    	.StallF(StallF),
+    	.StallD(StallD),
+    	.FlushE(FlushE)
 	);
 endmodule

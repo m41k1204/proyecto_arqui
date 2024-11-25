@@ -28,7 +28,10 @@ module datapath (
 	Match_1E_M,
     Match_1E_W,
     Match_2E_M,
-    Match_2E_W
+    Match_2E_W,
+	StallF,
+	StallD, 
+	FlushE
 );
 	input wire clk;
 	input wire reset;
@@ -59,11 +62,17 @@ module datapath (
 
 	input wire [1:0] ForwardAE;
 	input wire [1:0] ForwardBE;
+
+	input wire StallF; 
+	input wire StallD; 
+    input wire FlushE;
 	
 	output wire Match_1E_M;
     output wire Match_1E_W;
     output wire Match_2E_M;
     output wire Match_2E_W;
+
+	output wire Match_12D_E;
 
 
 	wire [3:0] RA1E;
@@ -89,7 +98,9 @@ module datapath (
 	      .i(InstrF),
 	      .j(InstrD),
 	      .clk(clk),
-	      .reset(reset)
+	      .reset(reset),
+		  .enable(StallF),
+		  .clear(1'b0)
 	);
 	
 	assign OutputDecode[31:0] = SrcA;
@@ -105,7 +116,10 @@ module datapath (
 	       .i(OutputDecode),
 	       .j(InputExecute),
 	       .clk(clk),
-	       .reset(reset)
+	       .reset(reset),
+		   .clear(FlushE),
+		   .enable(1'b1)
+
 	);
 	
 	assign ExtImmE = InputExecute[95:64];
@@ -113,12 +127,14 @@ module datapath (
 	assign RA1E = InputExecute[103:100];
 	assign RA2E = InputExecute[107:104];
 
-	// logica para los Match Signals
+	// logica para los Match Signals del Forwarding
 	assign Match_1E_M = (RA1E == WA3M);
 	assign Match_1E_W = (RA1E == WA3W);
 	assign Match_2E_M = (RA1E == WA3M);
 	assign Match_2E_W = (RA1E == WA3W);
-	
+
+	// logica para el Match Signaling del Stalling
+	assign Match_12D_E = (RA1 == WA3E) || (RA2 == WA3E);
 	
 	assign OutputExecute[31:0] = ALUResultE;
 	assign OutputExecute[63:32] = WriteDataE;
@@ -128,7 +144,9 @@ module datapath (
 	   .i(OutputExecute),
 	   .j(InputMemory),
 	   .clk(clk),
-       .reset(reset)
+       .reset(reset),
+	   .clear(1'b0),
+	   .enable(1'b1)
 	);
 	
 	assign ALUOutM = InputMemory[31:0];
@@ -143,7 +161,9 @@ module datapath (
 	   .i(OutputMemory),
 	   .j(InputWriteBack),
 	   .clk(clk),
-       .reset(reset)
+       .reset(reset),
+	   .clear(1'b0),
+	   .enable(1'b1)
 	);
 	
 	mux2 #(32) pcmux(

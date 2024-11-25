@@ -1,18 +1,20 @@
 module ff1to1(
     
     input wire [WIDTH - 1:0] i,
-    output wire [WIDTH - 1:0] j,
+    output reg [WIDTH - 1:0] j,
     input wire clk,
-    input wire reset
+    input wire reset,
+    input wire enable,
+    input wire clear
     );
-    
+
+
     parameter WIDTH = 8;
     
-    reg [WIDTH - 1:0] temp;
     always @ (posedge clk)
-        if(reset) temp <= 0;
-        else temp <= i;
-        
-    assign j = temp;
+        if(reset || clear) j <= 0;
+        else if (enable) j <= i;
+        else
+            j <= j;
 
 endmodule
