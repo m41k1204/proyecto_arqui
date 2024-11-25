@@ -103,7 +103,7 @@ module datapath (
 	      .j(InstrD),
 	      .clk(clk),
 	      .reset(reset),
-		  .enable(StallF),
+		  .enable(StallD),
 		  .clear(FlushD)
 	);
 	

@@ -28,8 +28,8 @@ wire PCWrPendingF;
 
 assign PCWrPendingF = PCSrcD + PCSrcE + PCSrcM;
 assign LDRstall = Match_12D_E & MemToRegE;
-assign StallF = LDRstall || PCWrPendingF;
-assign StallD = LDRstall;
+assign StallF = ~(LDRstall || PCWrPendingF);
+assign StallD = ~LDRstall;
 assign FlushE = LDRstall || BranchTakenE;
 assign FlushD = PCWrPendingF || PCSrcW || BranchTakenE;
 
