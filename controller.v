@@ -9,6 +9,7 @@ module controller (
 	ALUFlags,
 	RegSrc,
 	RegWriteW,
+	RegWriteM,
 	ImmSrc,
 	ALUSrcE,
 	ALUControlE,
@@ -19,7 +20,10 @@ module controller (
 	BranchTakenE,
 	StallD, 
 	FlushD,
-	FlushE
+	FlushE,
+	PCSrcD,
+	PCSrcE,
+	PCSrcM
 
 );
 	input wire clk;
@@ -36,7 +40,7 @@ module controller (
 	wire MemWrite;
 	wire MemtoReg;
 	wire [1:0] FlagWrite;
-	wire PCSrc;
+	output wire PCSrcD;
 	wire RegWriteD;
 	wire MemW;
 
@@ -44,7 +48,7 @@ module controller (
 	wire Branch;
 	wire [3:0] Flags;
 
-	wire PCSrcE;
+	output wire PCSrcE;
 	wire RegWriteE;
 	output wire MemToRegE;
 	wire MemWriteE;
@@ -55,8 +59,8 @@ module controller (
 	wire [3:0] CondE;
 	wire [3:0] FlagsE;
 
-	wire PCSrcM;
-	wire RegWriteM;
+	output wire PCSrcM;
+	output wire RegWriteM;
 	wire MemToRegM;
 
 	output wire BranchTakenE;
@@ -89,7 +93,7 @@ module controller (
 		.Funct(InstrD[25:20]),
 		.Rd(InstrD[15:12]),
 		.FlagW(FlagWrite),
-		.PCS(PCSrc),
+		.PCS(PCSrcD),
 		.RegW(RegWriteD),
 		.MemW(MemW),
 		.MemtoReg(MemtoReg),
@@ -100,7 +104,7 @@ module controller (
 		.Branch(Branch)
 	);
 
-	assign OutputDecode [0] = PCSrc;
+	assign OutputDecode [0] = PCSrcD;
 	assign OutputDecode [1] = RegWriteD;
 	assign OutputDecode [2] = MemtoReg;
 	assign OutputDecode [3] = MemWrite;

@@ -33,7 +33,8 @@ module datapath (
 	StallD, 
 	FlushE,
 	FlushD,
-	BranchTakenE
+	BranchTakenE,
+	Match_12D_E
 );
 	input wire clk;
 	input wire reset;
@@ -134,8 +135,8 @@ module datapath (
 	// logica para los Match Signals del Forwarding
 	assign Match_1E_M = (RA1E == WA3M);
 	assign Match_1E_W = (RA1E == WA3W);
-	assign Match_2E_M = (RA1E == WA3M);
-	assign Match_2E_W = (RA1E == WA3W);
+	assign Match_2E_M = (RA2E == WA3M);
+	assign Match_2E_W = (RA2E == WA3W);
 
 	// logica para el Match Signaling del Stalling
 	assign Match_12D_E = (RA1 == WA3E) || (RA2 == WA3E);
@@ -183,11 +184,12 @@ module datapath (
 		.s(BranchTakenE),
 		.y(PC_)
 	);
+	
 
 	flopr #(32) pcreg(
 		.clk(clk),
 		.reset(reset),
-		.d(PCNext),
+		.d(PC_),
 		.q(PC),
 		.enable(StallF)
 	);

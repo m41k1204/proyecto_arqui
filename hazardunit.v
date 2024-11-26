@@ -1,6 +1,7 @@
 `timescale 1ps/1ps
 
 module hazardunit(
+    input wire reset,
     input wire clk,
     input wire RegWriteW, 
     input wire RegWriteM,
@@ -28,10 +29,10 @@ wire PCWrPendingF;
 
 assign PCWrPendingF = PCSrcD + PCSrcE + PCSrcM;
 assign LDRstall = Match_12D_E & MemToRegE;
-assign StallF = ~(LDRstall || PCWrPendingF);
-assign StallD = ~LDRstall;
-assign FlushE = LDRstall || BranchTakenE;
-assign FlushD = PCWrPendingF || PCSrcW || BranchTakenE;
+assign StallF = reset ? 1'b0 : ~(LDRstall || PCWrPendingF);
+assign StallD = reset ? 1'b0 : ~LDRstall;
+assign FlushE = reset ? 1'b0 : (LDRstall || BranchTakenE);
+assign FlushD = reset ? 1'b0 : (PCWrPendingF || PCSrcW || BranchTakenE);
 
 always @(*) begin
     if (Match_1E_M & RegWriteM)         

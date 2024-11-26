@@ -23,7 +23,6 @@ module arm (
 	wire RegWrite;
 	wire ALUSrc;
 	wire MemtoReg;
-	wire PCSrc;
 	wire [1:0] RegSrc;
 	wire [1:0] ImmSrc;
 	wire [3:0] ALUControl;
@@ -36,8 +35,8 @@ module arm (
     wire Match_2E_M;
     wire Match_2E_W;
     wire Match_12D_E;
-    reg [1:0] ForwardAE;
-    reg [1:0] ForwardBE;
+    wire [1:0] ForwardAE;
+    wire [1:0] ForwardBE;
     wire StallF;
     wire StallD;
     wire FlushE;
@@ -55,29 +54,33 @@ module arm (
 		.Instr(Instr[31:12]),
 		.ALUFlags(ALUFlags),
 		.RegSrc(RegSrc),
-		.RegWriteW(RegWrite),
+		.RegWriteW(RegWriteW),
 		.ImmSrc(ImmSrc),
 		.ALUSrcE(ALUSrc),
 		.ALUControlE(ALUControl),
 		.MemWriteM(MemWrite),
 		.MemtoRegW(MemtoReg),
-		.PCSrcW(PCSrc),
+		.PCSrcW(PCSrcW),
 		.MemToRegE(MemToRegE),
 		.BranchTakenE(BranchTakenE),
 		.StallD(StallD), 
 		.FlushE(FlushE),
-		.FlushD(FlushD)
+		.FlushD(FlushD),
+		.PCSrcD(PCSrcD),
+		.PCSrcE(PCSrcE),
+		.PCSrcM(PCSrcM),
+		.RegWriteM(RegWriteM)
 	);
 	datapath dp(
 		.clk(clk),
 		.reset(reset),
 		.RegSrc(RegSrc),
-		.RegWrite(RegWrite),
+		.RegWrite(RegWriteW),
 		.ImmSrc(ImmSrc),
 		.ALUSrc(ALUSrc),
 		.ALUControl(ALUControl),
 		.MemtoReg(MemtoReg),
-		.PCSrc(PCSrc),
+		.PCSrc(PCSrcW),
 		.ALUFlags(ALUFlags),
 		.PC(PC),
 		.InstrF(Instr),
@@ -90,6 +93,7 @@ module arm (
 		.Match_1E_W(Match_1E_W),
 		.Match_2E_M(Match_2E_M),
 		.Match_2E_W(Match_2E_W),
+		.Match_12D_E(Match_12D_E),
 		.StallF(StallF),
 		.StallD(StallD), 
 		.FlushE(FlushE),
@@ -99,6 +103,7 @@ module arm (
 
 	hazardunit hz(
 		.clk(clk),
+		.reset(reset),
 		.RegWriteW(RegWriteW), 
     	.RegWriteM(RegWriteM),
     	.MemToRegE(MemToRegE),  
