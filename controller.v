@@ -16,13 +16,19 @@ module controller (
 	MemtoRegW,
 	PCSrcW,
 	MemToRegE,
-	BranchTakenE
+	BranchTakenE,
+	StallD, 
+	FlushD,
+	FlushE
 
 );
 	input wire clk;
 	input wire reset;
 	input wire [31:12] Instr;
 	input wire [3:0] ALUFlags;
+	input wire StallD;
+	input wire FlushD;
+	input wire FlushE;
 	output wire [1:0] RegSrc;
 	output wire [1:0] ImmSrc;
 	wire ALUSrc;
@@ -73,7 +79,9 @@ module controller (
 	   .i(Instr),
 	   .j(InstrD),
 	   .clk(clk),
-	   .reset(reset)
+	   .reset(reset),
+	   .enable(StallD),
+	   .clear(FlushD)
 	);
 	
 	decode dec(
@@ -107,7 +115,9 @@ module controller (
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
-        .reset(reset)
+        .reset(reset),
+		.enable(1'b1),
+		.clear(FlushE)
 	);
 
 	assign PCSrcE = InputExecute[0];
@@ -131,7 +141,9 @@ module controller (
 		.i(OutputExecute),
 		.j(InputMemory),
 		.clk(clk),
-       .reset(reset)
+       .reset(reset),
+	   .enable(1'b1),
+	   .clear(1'b0)
 	);
 
 	assign PCSrcM = InputMemory[0];
@@ -147,7 +159,9 @@ module controller (
 		.i(OutputMemory),
 		.j(InputWriteBack),
 		.clk(clk),
-       .reset(reset)
+       .reset(reset),
+	   .enable(1'b1),
+	   .clear(1'b0)
 	);
 
 	assign PCSrcW = InputWriteBack[0];

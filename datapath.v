@@ -188,7 +188,8 @@ module datapath (
 		.clk(clk),
 		.reset(reset),
 		.d(PCNext),
-		.q(PC)
+		.q(PC),
+		.enable(StallF)
 	);
 	adder #(32) pcadd1(
 		.a(PC),

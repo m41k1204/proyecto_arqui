@@ -49,8 +49,6 @@ module arm (
 	wire PCSrcM;
 	wire PCSrcW;
 
-
-
 	controller c(
 		.clk(clk),
 		.reset(reset),
@@ -65,7 +63,10 @@ module arm (
 		.MemtoRegW(MemtoReg),
 		.PCSrcW(PCSrc),
 		.MemToRegE(MemToRegE),
-		.BranchTakenE(BranchTakenE)
+		.BranchTakenE(BranchTakenE),
+		.StallD(StallD), 
+		.FlushE(FlushE),
+		.FlushD(FlushD)
 	);
 	datapath dp(
 		.clk(clk),
