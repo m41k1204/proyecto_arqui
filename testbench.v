@@ -6,13 +6,13 @@ module testbench;
 	reg reset;
 	wire [31:0] WriteData;
 	wire [31:0] DataAdr;
-	wire MemWrite;
+	wire MemWriteM;
 	top dut(
 		.clk(clk),
 		.reset(reset),
 		.WriteData(WriteData),
 		.DataAdr(DataAdr),
-		.MemWrite(MemWrite)
+		.MemWriteM(MemWriteM)
 	);
 	initial begin
 		reset <= 1;
@@ -29,7 +29,7 @@ module testbench;
 			;
 	end
 	always @(negedge clk)
-		if (MemWrite)
+		if (MemWriteM)
 			if ((DataAdr === 100) & (WriteData === 7)) begin
 				$display("Simulation succeeded");
 				$stop;

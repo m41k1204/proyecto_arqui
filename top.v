@@ -7,13 +7,13 @@ module top (
 	reset,
 	WriteData,
 	DataAdr,
-	MemWrite
+	MemWriteM
 );
 	input wire clk;
 	input wire reset;
 	output wire [31:0] WriteData;
 	output wire [31:0] DataAdr;
-	output wire MemWrite;
+	output wire MemWriteM;
 	wire [31:0] PC;
 	wire [31:0] Instr;
 	wire [31:0] ReadData;
@@ -22,7 +22,7 @@ module top (
 		.reset(reset),
 		.PC(PC),
 		.Instr(Instr),
-		.MemWrite(MemWrite),
+		.MemWriteM(MemWriteM),
 		.ALUResult(DataAdr),
 		.WriteData(WriteData),
 		.ReadData(ReadData)
@@ -33,7 +33,7 @@ module top (
 	);
 	dmem dmem(
 		.clk(clk),
-		.we(MemWrite),
+		.we(MemWriteM),
 		.a(DataAdr),
 		.wd(WriteData),
 		.rd(ReadData)

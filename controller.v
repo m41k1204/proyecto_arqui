@@ -37,7 +37,7 @@ module controller (
 	output wire [1:0] ImmSrc;
 	wire ALUSrc;
 	wire [3:0] ALUControl;
-	wire MemWrite;
+	wire MemWriteD;
 	wire MemtoReg;
 	wire [1:0] FlagWrite;
 	output wire PCSrcD;
@@ -95,7 +95,7 @@ module controller (
 		.FlagW(FlagWrite),
 		.PCS(PCSrcD),
 		.RegW(RegWriteD),
-		.MemW(MemW),
+		.MemW(MemWriteD),
 		.MemtoReg(MemtoReg),
 		.ALUSrc(ALUSrc),
 		.ImmSrc(ImmSrc),
@@ -107,7 +107,7 @@ module controller (
 	assign OutputDecode [0] = PCSrcD;
 	assign OutputDecode [1] = RegWriteD;
 	assign OutputDecode [2] = MemtoReg;
-	assign OutputDecode [3] = MemWrite;
+	assign OutputDecode [3] = MemWriteD;
 	assign OutputDecode [7:4] = ALUControl;
 	assign OutputDecode [8] = Branch;
 	assign OutputDecode [9] = ALUSrc;
