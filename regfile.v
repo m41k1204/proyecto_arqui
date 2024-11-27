@@ -18,6 +18,9 @@ module regfile (
 	input wire [31:0] r15;
 	output wire [31:0] rd1;
 	output wire [31:0] rd2;
+
+
+	
 	reg [31:0] rf [14:0];
 	always @(posedge ~clk)
 		if (we3)
