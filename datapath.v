@@ -5,6 +5,7 @@
 `include "regfile.v"
 `include "extend.v"
 `include "alu.v"
+`include "mux4.v"
 
 module datapath (
 	clk,
@@ -22,10 +23,18 @@ module datapath (
 	ALUOutM,
 	WriteDataM,
 	ReadData,
+	ForwardAE, 
+	ForwardBE,
 	Match_1E_M,
     Match_1E_W,
     Match_2E_M,
-    Match_2E_W
+    Match_2E_W,
+	StallF,
+	StallD, 
+	FlushE,
+	FlushD,
+	BranchTakenE,
+	Match_12D_E
 );
 	input wire clk;
 	input wire reset;
@@ -53,8 +62,24 @@ module datapath (
 	wire [3:0] RA2;
 	wire [107:0] OutputDecode;
 	wire [107:0] InputExecute;
+
+	wire [31:0] PC_;
+	input wire [1:0] ForwardAE;
+	input wire [1:0] ForwardBE;
+	input wire BranchTakenE;
+	input wire StallF; 
+	input wire StallD; 
+    input wire FlushE;
+	input wire FlushD;
 	
-	
+	output wire Match_1E_M;
+    output wire Match_1E_W;
+    output wire Match_2E_M;
+    output wire Match_2E_W;
+
+	output wire Match_12D_E;
+
+
 	wire [3:0] RA1E;
 	wire [3:0] RA2E;
 	wire [31:0] SrcAE;
@@ -63,6 +88,8 @@ module datapath (
 	wire [31:0] WriteDataE;
 	wire [3:0] WA3E;
 	wire [31:0] ALUResultE;
+
+	wire [3:0] WA3M;
 	
 	wire [67:0] OutputExecute;
 	wire [67:0] InputMemory;
@@ -70,17 +97,15 @@ module datapath (
 	wire [67:0] OutputMemory;
 	wire [67:0] InputWriteBack;
 		
-	output wire Match_1E_M,
-    output wire Match_1E_W,
-    output wire Match_2E_M,
-    output wire Match_2E_W
 
 
 	ff1to1 #(32) FetchToDecodeReg(
 	      .i(InstrF),
 	      .j(InstrD),
 	      .clk(clk),
-	      .reset(reset)
+	      .reset(reset),
+		  .enable(StallD),
+		  .clear(FlushD)
 	);
 	
 	assign OutputDecode[31:0] = SrcA;
@@ -96,20 +121,25 @@ module datapath (
 	       .i(OutputDecode),
 	       .j(InputExecute),
 	       .clk(clk),
-	       .reset(reset)
+	       .reset(reset),
+		   .clear(FlushE),
+		   .enable(1'b1)
+
 	);
 	
-	assign SrcAE = InputExecute[31:0];
-	assign WriteDataE = InputExecute[63:32];
 	assign ExtImmE = InputExecute[95:64];
 	assign WA3E = InputExecute[99:96];
 	assign RA1E = InputExecute[103:100];
 	assign RA2E = InputExecute[107:104];
 
-	// logica para los Match Signals
+	// logica para los Match Signals del Forwarding
+	assign Match_1E_M = (RA1E == WA3M);
+	assign Match_1E_W = (RA1E == WA3W);
+	assign Match_2E_M = (RA2E == WA3M);
+	assign Match_2E_W = (RA2E == WA3W);
 
-
-
+	// logica para el Match Signaling del Stalling
+	assign Match_12D_E = (RA1 == WA3E) || (RA2 == WA3E);
 	
 	assign OutputExecute[31:0] = ALUResultE;
 	assign OutputExecute[63:32] = WriteDataE;
@@ -119,21 +149,26 @@ module datapath (
 	   .i(OutputExecute),
 	   .j(InputMemory),
 	   .clk(clk),
-       .reset(reset)
+       .reset(reset),
+	   .clear(1'b0),
+	   .enable(1'b1)
 	);
 	
 	assign ALUOutM = InputMemory[31:0];
 	assign WriteDataM = InputMemory[63:32];
+	assign WA3M = InputMemory[67:64];
 	
 	assign OutputMemory[31:0] = ReadData;
 	assign OutputMemory[63:32] = ALUOutM;
-	assign OutputMemory[67:64] = InputMemory[67:64];
+	assign OutputMemory[67:64] = WA3M;
 	
 	ff1to1 #(68) MemoryToWriteBackReg (
 	   .i(OutputMemory),
 	   .j(InputWriteBack),
 	   .clk(clk),
-       .reset(reset)
+       .reset(reset),
+	   .clear(1'b0),
+	   .enable(1'b1)
 	);
 	
 	mux2 #(32) pcmux(
@@ -142,11 +177,21 @@ module datapath (
 		.s(PCSrc),
 		.y(PCNext)
 	);
+
+	mux2 #(32) branchmux(
+		.d0(PCNext),
+		.d1(ALUResultE),
+		.s(BranchTakenE),
+		.y(PC_)
+	);
+	
+
 	flopr #(32) pcreg(
 		.clk(clk),
 		.reset(reset),
-		.d(PCNext),
-		.q(PC)
+		.d(PC_),
+		.q(PC),
+		.enable(StallF)
 	);
 	adder #(32) pcadd1(
 		.a(PC),
@@ -200,6 +245,23 @@ module datapath (
 		.s(ALUSrc),
 		.y(SrcBE)
 	);
+
+	mux4 forwardsrcamux(
+		.d0(InputExecute[31:0]),
+		.d1(ResultW),
+		.d2(ALUOutM),
+		.s(ForwardAE),
+		.y(SrcAE)
+	);
+
+	mux4 forwardsrcbmux(
+		.d0(InputExecute[63:32]),
+		.d1(ResultW),
+		.d2(ALUOutM),
+		.s(ForwardBE),
+		.y(WriteDataE)
+	);
+
 	alu alu(
 		SrcAE,
 		SrcBE,

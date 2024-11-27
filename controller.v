@@ -9,25 +9,38 @@ module controller (
 	ALUFlags,
 	RegSrc,
 	RegWriteW,
+	RegWriteM,
 	ImmSrc,
 	ALUSrcE,
 	ALUControlE,
 	MemWriteM,
 	MemtoRegW,
-	PCSrcW
+	PCSrcW,
+	MemToRegE,
+	BranchTakenE,
+	StallD, 
+	FlushD,
+	FlushE,
+	PCSrcD,
+	PCSrcE,
+	PCSrcM
+
 );
 	input wire clk;
 	input wire reset;
 	input wire [31:12] Instr;
 	input wire [3:0] ALUFlags;
+	input wire StallD;
+	input wire FlushD;
+	input wire FlushE;
 	output wire [1:0] RegSrc;
 	output wire [1:0] ImmSrc;
 	wire ALUSrc;
 	wire [3:0] ALUControl;
-	wire MemWrite;
+	wire MemWriteD;
 	wire MemtoReg;
 	wire [1:0] FlagWrite;
-	wire PCSrc;
+	output wire PCSrcD;
 	wire RegWriteD;
 	wire MemW;
 
@@ -35,9 +48,9 @@ module controller (
 	wire Branch;
 	wire [3:0] Flags;
 
-	wire PCSrcE;
+	output wire PCSrcE;
 	wire RegWriteE;
-	wire MemToRegE;
+	output wire MemToRegE;
 	wire MemWriteE;
 	output wire [3:0] ALUControlE;
 	wire BranchE;
@@ -46,9 +59,11 @@ module controller (
 	wire [3:0] CondE;
 	wire [3:0] FlagsE;
 
-	wire PCSrcM;
-	wire RegWriteM;
+	output wire PCSrcM;
+	output wire RegWriteM;
 	wire MemToRegM;
+
+	output wire BranchTakenE;
 	output wire MemWriteM;
 
 	output wire PCSrcW;
@@ -68,7 +83,9 @@ module controller (
 	   .i(Instr),
 	   .j(InstrD),
 	   .clk(clk),
-	   .reset(reset)
+	   .reset(reset),
+	   .enable(StallD),
+	   .clear(FlushD)
 	);
 	
 	decode dec(
@@ -76,9 +93,9 @@ module controller (
 		.Funct(InstrD[25:20]),
 		.Rd(InstrD[15:12]),
 		.FlagW(FlagWrite),
-		.PCS(PCSrc),
+		.PCS(PCSrcD),
 		.RegW(RegWriteD),
-		.MemW(MemW),
+		.MemW(MemWriteD),
 		.MemtoReg(MemtoReg),
 		.ALUSrc(ALUSrc),
 		.ImmSrc(ImmSrc),
@@ -87,10 +104,10 @@ module controller (
 		.Branch(Branch)
 	);
 
-	assign OutputDecode [0] = PCSrc;
+	assign OutputDecode [0] = PCSrcD;
 	assign OutputDecode [1] = RegWriteD;
 	assign OutputDecode [2] = MemtoReg;
-	assign OutputDecode [3] = MemWrite;
+	assign OutputDecode [3] = MemWriteD;
 	assign OutputDecode [7:4] = ALUControl;
 	assign OutputDecode [8] = Branch;
 	assign OutputDecode [9] = ALUSrc;
@@ -102,7 +119,9 @@ module controller (
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
-       .reset(reset)
+        .reset(reset),
+		.enable(1'b1),
+		.clear(FlushE)
 	);
 
 	assign PCSrcE = InputExecute[0];
@@ -116,7 +135,8 @@ module controller (
 	assign CondE = InputExecute[15:12];
 	assign FlagsE = InputExecute[19:16];
 
-	assign OutputExecute[0] = (PCSrcE & CondExE) | (BranchE & CondExE);
+	assign BranchTakenE = (BranchE & CondExE);
+	assign OutputExecute[0] = (PCSrcE & CondExE) ;
 	assign OutputExecute[1] = RegWriteE & CondExE;
 	assign OutputExecute[2] = MemToRegE;
 	assign OutputExecute[3] = MemWriteE & CondExE;
@@ -125,7 +145,9 @@ module controller (
 		.i(OutputExecute),
 		.j(InputMemory),
 		.clk(clk),
-       .reset(reset)
+       .reset(reset),
+	   .enable(1'b1),
+	   .clear(1'b0)
 	);
 
 	assign PCSrcM = InputMemory[0];
@@ -141,7 +163,9 @@ module controller (
 		.i(OutputMemory),
 		.j(InputWriteBack),
 		.clk(clk),
-       .reset(reset)
+       .reset(reset),
+	   .enable(1'b1),
+	   .clear(1'b0)
 	);
 
 	assign PCSrcW = InputWriteBack[0];
