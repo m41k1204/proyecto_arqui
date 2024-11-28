@@ -2,18 +2,23 @@
 `include "clk_div_pipelined.v"
 `include "basysdecoder.v"
 
-module demo;
+module demo(
+    clk,
+    rst,
+    out, 
+    enable
+);
 
-wire clk;
+input wire clk;
 wire real_clk;
-wire rst;
+input wire rst;
 wire ResultW;
 wire WriteData;
 wire DataAdr;
 wire MemWriteM;
 
-wire out;
-wire enable;
+output wire out;
+output wire enable;
 
 
 clkdivider clk_divider(
