@@ -34,7 +34,14 @@ module datapath (
 	FlushE,
 	FlushD,
 	BranchTakenE,
-	Match_12D_E
+	Match_12D_E,
+	Carry,
+	NoWrite,
+	Shift,
+	Saturated,
+	Negate,
+	Unsigned,
+	Long
 );
 	input wire clk;
 	input wire reset;
@@ -71,6 +78,14 @@ module datapath (
 	input wire StallD; 
     input wire FlushE;
 	input wire FlushD;
+
+	input wire Carry;
+	input wire NoWrite;
+	input wire Shift;
+	input wire Saturated;
+	input wire Negate;
+	input wire Unsigned;
+	input wire Long;
 	
 	output wire Match_1E_M;
     output wire Match_1E_W;
