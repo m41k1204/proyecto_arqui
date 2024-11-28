@@ -21,7 +21,7 @@ output wire out;
 output wire enable;
 
 
-clkdivider clk_divider(
+clk_divider clk_divider(
     .clk(clk),
     .rst(rst),
     .led(real_clk)

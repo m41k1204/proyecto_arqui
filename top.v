@@ -18,7 +18,7 @@ module top (
 	wire [31:0] PC;
 	wire [31:0] Instr;
 	wire [31:0] ReadData;
-	output wire ResultW;
+	output wire [31:0] ResultW;
 	arm arm(
 		.clk(clk),
 		.reset(reset),
