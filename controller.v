@@ -23,8 +23,14 @@ module controller (
 	FlushE,
 	PCSrcD,
 	PCSrcE,
-	PCSrcM
-
+	PCSrcM,
+	CarryE,
+	NoWriteE,
+	ShiftE,
+	SaturatedE,
+	NegateE,
+	UnsignedE,
+	LongE
 );
 	input wire clk;
 	input wire reset;
@@ -44,6 +50,14 @@ module controller (
 	wire RegWriteD;
 	wire MemW;
 
+	wire CarryD;
+	wire NoWriteD;
+	wire ShiftD;
+	wire SaturatedD;
+	wire NegateD;
+	wire UnsignedD;
+	wire LongD;
+
 	wire CondExE;
 	wire Branch;
 	wire [3:0] Flags;
@@ -59,6 +73,14 @@ module controller (
 	wire [3:0] CondE;
 	wire [3:0] FlagsE;
 
+	output wire CarryE;
+	output wire NoWriteE;
+	output wire ShiftE;
+	output wire SaturatedE;
+	output wire NegateE;
+	output wire UnsignedE;
+	output wire LongE;
+
 	output wire PCSrcM;
 	output wire RegWriteM;
 	wire MemToRegM;
@@ -70,8 +92,8 @@ module controller (
 	output wire RegWriteW;
 	output wire MemtoRegW;
 
-	wire [20:0] OutputDecode;
-	wire [20:0] InputExecute;
+	wire [25:0] OutputDecode;
+	wire [25:0] InputExecute;
 	wire [3:0] OutputExecute;
 	wire [3:0] InputMemory;
 	wire [2:0] OutputMemory;
@@ -101,7 +123,14 @@ module controller (
 		.ImmSrc(ImmSrc),
 		.RegSrc(RegSrc),
 		.ALUControl(ALUControl),
-		.Branch(Branch)
+		.Branch(Branch),
+		.Carry(CarryD),
+		.NoWrite(NoWriteD),
+		.Shift(ShiftD),
+		.Saturated(SaturatedD),
+		.Negate(NegateD),
+		.Unsigned(UnsignedD),
+		.Long(LongD)
 	);
 
 	assign OutputDecode [0] = PCSrcD;
@@ -114,8 +143,14 @@ module controller (
 	assign OutputDecode [11:10] = FlagWrite;
 	assign OutputDecode [15:12] = InstrD[31:28];
 	assign OutputDecode [19:16] = Flags;
+	assign OutputDecode [20] = CarryD;
+	assign OutputDecode [21] = NoWriteD;
+	assign OutputDecode [22] = ShiftD;
+	assign OutputDecode [23] = SaturatedD;
+	assign OutputDecode [24] = NegateD;
+	assign OutputDecode [25] = LongD;
 	
-	ff1to1 #(21) DecodeToExecuteReg(
+	ff1to1 #(26) DecodeToExecuteReg(
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
@@ -134,6 +169,12 @@ module controller (
 	assign FlagWriteE = InputExecute[11:10];
 	assign CondE = InputExecute[15:12];
 	assign FlagsE = InputExecute[19:16];
+	assign CarryE = InputExecute[20];
+	assign NoWriteE = InputExecute[21];
+	assign ShiftE = InputExecute[22];
+	assign SaturatedE = InputExecute[23];
+	assign NegateE = InputExecute[24];
+	assign LongE = InputExecute[25];
 
 	assign BranchTakenE = (BranchE & CondExE);
 	assign OutputExecute[0] = (PCSrcE & CondExE) ;
