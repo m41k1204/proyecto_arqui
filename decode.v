@@ -65,7 +65,7 @@ module decode (
 	assign Shift = (Op == 2'b00) & (Funct[4:0] == 4'b1101);
 	assign Saturated = (Op == 2'b00) & (Funct[4:0] == 5'b10000 | Funct[4:0] == 5'b10010);
 	assign Negate = (Op == 2'b00) & (Funct[4:0] == 4'b1110 | Funct[4:0] == 4'b1111);
-	assign Unsigned = (Op == 2'b11) & (Funct[4:0] == 4'b0011 | Funct[4:0] == 4'b0100 | Funct[4:0] == 4'b0111);
+	assign Unsigned = (Op == 2'b11) & ~(Funct[4:0] == 4'b0101 | Funct[4:0] == 4'b0110 | Funct[4:0] == 4'b1000);
 	assign Long = (Op == 2'b11) & (Funct[4:0] == 4'b0011 | Funct[4:0] == 4'b0100 | Funct[4:0] == 4'b0101 | Funct[4:0] == 4'b0110);
 
 	always @(*)
@@ -135,9 +135,9 @@ module decode (
 
 					4'b0110: ALUControl = 4'b0111;
 
-					4'b0111: ALUControl = 4'b1000;
+					4'b0111: ALUControl = 4'b1001;
 
-					4'b1000: ALUControl = 4'b1000;
+					4'b1000: ALUControl = 4'b1001;
 
 					default: ALUControl = 4'bxxxx;
 				endcase

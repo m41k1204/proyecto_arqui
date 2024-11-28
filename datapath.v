@@ -278,10 +278,17 @@ module datapath (
 	);
 
 	alu alu(
-		SrcAE,
-		SrcBE,
-		ALUControl,
-		ALUResultE,
-		ALUFlags
+		.a(SrcAE),
+		.b(SrcBE),
+		.c(SrcCE),
+		.ALUControl(ALUControl),
+		.Carry(Carry),
+		.curr_carry_flag(CarryFlagE),
+		.Saturated(Saturated),
+		.Negate(Negate),
+		.Unsigned(Unsigned),
+		.Result(ALUResultE),
+		.HiResult(ALUHiResultE),
+		.ALUFlags(ALUFlags)
 	);
 endmodule
