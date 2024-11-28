@@ -7,7 +7,8 @@ module top (
 	reset,
 	WriteData,
 	DataAdr,
-	MemWriteM
+	MemWriteM,
+	ResultW
 );
 	input wire clk;
 	input wire reset;
@@ -17,6 +18,7 @@ module top (
 	wire [31:0] PC;
 	wire [31:0] Instr;
 	wire [31:0] ReadData;
+	output wire ResultW;
 	arm arm(
 		.clk(clk),
 		.reset(reset),
@@ -25,7 +27,8 @@ module top (
 		.MemWriteM(MemWriteM),
 		.ALUResult(DataAdr),
 		.WriteData(WriteData),
-		.ReadData(ReadData)
+		.ReadData(ReadData),
+		.ResultW(ResultW)
 	);
 	imem imem(
 		.a(PC),

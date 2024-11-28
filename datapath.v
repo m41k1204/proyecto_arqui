@@ -41,7 +41,8 @@ module datapath (
 	Saturated,
 	Negate,
 	Unsigned,
-	Long
+	Long,
+	ResultW
 );
 	input wire clk;
 	input wire reset;
@@ -64,7 +65,7 @@ module datapath (
 	wire [31:0] PCPlus4;
 	wire [31:0] ExtImm;
 	wire [31:0] SrcA;
-	wire [31:0] ResultW;
+	output wire [31:0] ResultW;
 	wire [3:0] RA1;
 	wire [3:0] RA2;
 	wire [107:0] OutputDecode;
