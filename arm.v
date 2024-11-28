@@ -46,6 +46,14 @@ module arm (
 	wire BranchTakenE;
 	wire FlushD;
 
+	wire Carry;
+	wire NoWrite;
+	wire Shift;
+	wire Saturated;
+	wire Negate;
+	wire Unsigned;
+	wire Long;
+
 	wire PCSrcD;
 	wire PCSrcE;
 	wire PCSrcM;
@@ -72,8 +80,16 @@ module arm (
 		.PCSrcD(PCSrcD),
 		.PCSrcE(PCSrcE),
 		.PCSrcM(PCSrcM),
-		.RegWriteM(RegWriteM)
+		.RegWriteM(RegWriteM),
+		.CarryE(Carry),
+		.NoWriteE(NoWrite),
+		.ShiftE(Shift),
+		.SaturatedE(Saturated),
+		.NegateE(Negate),
+		.UnsignedE(Unsigned),
+		.LongE(Long)
 	);
+
 	datapath dp(
 		.clk(clk),
 		.reset(reset),
@@ -103,6 +119,13 @@ module arm (
 		.FlushD(FlushD),
 		.BranchTakenE(BranchTakenE),
 		.ResultW(ResultW)
+		.Carry(Carry),
+		.NoWrite(NoWrite),
+		.Shift(Shift),
+		.Saturated(Saturated),
+		.Negate(Negate),
+		.Unsigned(Unsigned),
+		.Long(Long)
 	);
 
 	hazardunit hz(

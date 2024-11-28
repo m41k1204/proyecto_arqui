@@ -35,6 +35,13 @@ module datapath (
 	FlushD,
 	BranchTakenE,
 	Match_12D_E,
+	Carry,
+	NoWrite,
+	Shift,
+	Saturated,
+	Negate,
+	Unsigned,
+	Long,
 	ResultW
 );
 	input wire clk;
@@ -72,6 +79,14 @@ module datapath (
 	input wire StallD; 
     input wire FlushE;
 	input wire FlushD;
+
+	input wire Carry;
+	input wire NoWrite;
+	input wire Shift;
+	input wire Saturated;
+	input wire Negate;
+	input wire Unsigned;
+	input wire Long;
 	
 	output wire Match_1E_M;
     output wire Match_1E_W;
@@ -264,10 +279,17 @@ module datapath (
 	);
 
 	alu alu(
-		SrcAE,
-		SrcBE,
-		ALUControl,
-		ALUResultE,
-		ALUFlags
+		.a(SrcAE),
+		.b(SrcBE),
+		.c(SrcCE),
+		.ALUControl(ALUControl),
+		.Carry(Carry),
+		.curr_carry_flag(CarryFlagE),
+		.Saturated(Saturated),
+		.Negate(Negate),
+		.Unsigned(Unsigned),
+		.Result(ALUResultE),
+		.HiResult(ALUHiResultE),
+		.ALUFlags(ALUFlags)
 	);
 endmodule
