@@ -35,7 +35,7 @@ module controller (
 	input wire clk;
 	input wire reset;
 	input wire [31:12] Instr;
-	input wire [3:0] ALUFlags;
+	input wire [4:0] ALUFlags;
 	input wire StallD;
 	input wire FlushD;
 	input wire FlushE;
@@ -60,7 +60,7 @@ module controller (
 
 	wire CondExE;
 	wire Branch;
-	wire [3:0] Flags;
+	wire [4:0] Flags;
 
 	output wire PCSrcE;
 	wire RegWriteE;
@@ -71,7 +71,7 @@ module controller (
 	output wire ALUSrcE;
 	wire [1:0] FlagWriteE;
 	wire [3:0] CondE;
-	wire [3:0] FlagsE;
+	wire [4:0] FlagsE;
 
 	output wire CarryE;
 	output wire NoWriteE;
@@ -92,8 +92,8 @@ module controller (
 	output wire RegWriteW;
 	output wire MemtoRegW;
 
-	wire [25:0] OutputDecode;
-	wire [25:0] InputExecute;
+	wire [26:0] OutputDecode;
+	wire [26:0] InputExecute;
 	wire [3:0] OutputExecute;
 	wire [3:0] InputMemory;
 	wire [2:0] OutputMemory;
@@ -142,15 +142,15 @@ module controller (
 	assign OutputDecode [9] = ALUSrc;
 	assign OutputDecode [11:10] = FlagWrite;
 	assign OutputDecode [15:12] = InstrD[31:28];
-	assign OutputDecode [19:16] = Flags;
-	assign OutputDecode [20] = CarryD;
-	assign OutputDecode [21] = NoWriteD;
-	assign OutputDecode [22] = ShiftD;
-	assign OutputDecode [23] = SaturatedD;
-	assign OutputDecode [24] = NegateD;
-	assign OutputDecode [25] = LongD;
+	assign OutputDecode [20:16] = Flags;
+	assign OutputDecode [21] = CarryD;
+	assign OutputDecode [22] = NoWriteD;
+	assign OutputDecode [23] = ShiftD;
+	assign OutputDecode [24] = SaturatedD;
+	assign OutputDecode [25] = NegateD;
+	assign OutputDecode [26] = LongD;
 	
-	ff1to1 #(26) DecodeToExecuteReg(
+	ff1to1 #(27) DecodeToExecuteReg(
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
@@ -168,16 +168,16 @@ module controller (
 	assign ALUSrcE = InputExecute[9];
 	assign FlagWriteE = InputExecute[11:10];
 	assign CondE = InputExecute[15:12];
-	assign FlagsE = InputExecute[19:16];
-	assign CarryE = InputExecute[20];
-	assign NoWriteE = InputExecute[21];
-	assign ShiftE = InputExecute[22];
-	assign SaturatedE = InputExecute[23];
-	assign NegateE = InputExecute[24];
-	assign LongE = InputExecute[25];
+	assign FlagsE = InputExecute[20:16];
+	assign CarryE = InputExecute[21];
+	assign NoWriteE = InputExecute[22];
+	assign ShiftE = InputExecute[23];
+	assign SaturatedE = InputExecute[24];
+	assign NegateE = InputExecute[25];
+	assign LongE = InputExecute[26];
 
 	assign BranchTakenE = (BranchE & CondExE);
-	assign OutputExecute[0] = (PCSrcE & CondExE) ;
+	assign OutputExecute[0] = (PCSrcE & CondExE);
 	assign OutputExecute[1] = RegWriteE & CondExE;
 	assign OutputExecute[2] = MemToRegE;
 	assign OutputExecute[3] = MemWriteE & CondExE;
@@ -218,7 +218,8 @@ module controller (
 		.reset(reset),
 		.Cond(CondE),
 		.ALUFlags(ALUFlags),
-		//.FlagW(FlagW),
+		.FlagWrite(FlagWriteE),
+		.Saturated(SaturatedE),
 		//.PCS(PCS),
 		//.RegW(RegW),
 		//.MemW(MemW),

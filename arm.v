@@ -20,7 +20,7 @@ module arm (
 	output wire [31:0] ALUResult;
 	output wire [31:0] WriteData;
 	input wire [31:0] ReadData;
-	wire [3:0] ALUFlags;
+	wire [4:0] ALUFlags;
 	wire RegWrite;
 	wire ALUSrc;
 	wire MemtoReg;
@@ -118,7 +118,7 @@ module arm (
 		.FlushE(FlushE),
 		.FlushD(FlushD),
 		.BranchTakenE(BranchTakenE),
-		.ResultW(ResultW)
+		.ResultW(ResultW),
 		.Carry(Carry),
 		.NoWrite(NoWrite),
 		.Shift(Shift),

@@ -53,7 +53,7 @@ module datapath (
 	input wire [3:0] ALUControl;
 	input wire MemtoReg;
 	input wire PCSrc;
-	output wire [3:0] ALUFlags;
+	output wire [4:0] ALUFlags;
 	output wire [31:0] PC;
 	input wire [31:0] InstrF;
 	wire [31:0] InstrD;

@@ -6,7 +6,8 @@ module condlogic (
 	reset,
 	Cond,
 	ALUFlags,
-	//FlagW,
+	FlagWrite,
+	Saturated,
 	//PCS,
 	//RegW,
 	//MemW,
@@ -19,7 +20,7 @@ module condlogic (
 	input wire clk;
 	input wire reset;
 	input wire [3:0] Cond;
-	input wire [3:0] ALUFlags;
+	input wire [4:0] ALUFlags;
 	//input wire [1:0] FlagW;
 	//input wire PCS;
 	//input wire RegW;
@@ -27,9 +28,19 @@ module condlogic (
 	//output wire PCSrc;
 	//output wire RegWrite;
 	//output wire MemWrite;
-	wire [1:0] FlagWrite;
-	output wire [3:0] Flags;
+	input wire [1:0] FlagWrite;
+	input wire Saturated;
+	output wire [4:0] Flags;
 	output wire CondEx;
+
+	flopenr #(1) flagreg2(
+		.clk(clk),
+		.reset(reset),
+		.en(Saturated),
+		.d(ALUFlags[4]),
+		.q(Flags[4])
+	);
+
 	flopenr #(2) flagreg1(
 		.clk(clk),
 		.reset(reset),
