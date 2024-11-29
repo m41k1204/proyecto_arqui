@@ -6,6 +6,7 @@
 `include "extend.v"
 `include "alu.v"
 `include "mux4.v"
+`include "shift.v"
 
 module datapath (
 	clk,
@@ -43,6 +44,12 @@ module datapath (
 	Negate,
 	Unsigned,
 	Long,
+	MImmediateD,
+	MPreindexD,
+	MUpD,
+	MByteD,
+	MWriteBackD,
+	MLoadD,
 	ResultW
 );
 	input wire clk;
@@ -89,6 +96,13 @@ module datapath (
 	input wire Negate;
 	input wire Unsigned;
 	input wire Long;
+
+	input wire MImmediateD;
+	input wire MPreindexD;
+	input wire MUpD;
+	input wire MByteD;
+	input wire MWriteBackD;
+	input wire MLoadD;
 	
 	output wire Match_1E_M;
     output wire Match_1E_W;
@@ -106,6 +120,7 @@ module datapath (
 	wire [31:0] WriteDataE;
 	wire [3:0] WA3E;
 	wire [31:0] ALUResultE;
+	wire [31:0] ALURes;
 
 	wire [3:0] WA3M;
 	
@@ -115,8 +130,6 @@ module datapath (
 	wire [67:0] OutputMemory;
 	wire [67:0] InputWriteBack;
 		
-
-
 	ff1to1 #(32) FetchToDecodeReg(
 	      .i(InstrF),
 	      .j(InstrD),
@@ -133,8 +146,6 @@ module datapath (
 	assign OutputDecode[103:100] = RA1;
 	assign OutputDecode[107:104] = RA2;
 
-
-
 	ff1to1 #(108) DecodeToExecuteReg(
 	       .i(OutputDecode),
 	       .j(InputExecute),
@@ -142,7 +153,6 @@ module datapath (
 	       .reset(reset),
 		   .clear(FlushE),
 		   .enable(1'b1)
-
 	);
 	
 	assign ExtImmE = InputExecute[95:64];
@@ -280,6 +290,17 @@ module datapath (
 		.y(WriteDataE)
 	);
 
+	mux2 #(32) shiftmux(
+		.d0(ALURes),
+		.d1(SrcBE),
+		.s(Shift),
+		.y(ALUResultE)
+	);
+
+	shift shift(
+
+	);
+
 	alu alu(
 		.a(SrcAE),
 		.b(SrcBE),
@@ -290,7 +311,7 @@ module datapath (
 		.Saturated(Saturated),
 		.Negate(Negate),
 		.Unsigned(Unsigned),
-		.Result(ALUResultE),
+		.Result(ALURes),
 		.HiResult(ALUHiResultE),
 		.ALUFlags(ALUFlags)
 	);
