@@ -129,7 +129,13 @@ module arm (
 		.Saturated(Saturated),
 		.Negate(Negate),
 		.Unsigned(Unsigned),
-		.Long(Long)
+		.Long(Long),
+		.MImmediateD(Instr[25]),
+		.MPreindexD(Instr[24]),
+		.MUpD(Instr[23]),
+		.MByteD(Instr[22]),
+		.MWriteBackD(Instr[21]),
+		.MLoadD(Instr[20])
 	);
 
 	hazardunit hz(
