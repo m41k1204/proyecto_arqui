@@ -30,7 +30,8 @@ module controller (
 	SaturatedE,
 	NegateE,
 	UnsignedE,
-	LongE
+	LongE,
+	CarryFlag
 );
 	input wire clk;
 	input wire reset;
@@ -71,7 +72,7 @@ module controller (
 	output wire ALUSrcE;
 	wire [1:0] FlagWriteE;
 	wire [3:0] CondE;
-	wire [4:0] FlagsE;
+	wire [4:0] FlagsE;	
 
 	output wire CarryE;
 	output wire NoWriteE;
@@ -91,6 +92,8 @@ module controller (
 	output wire PCSrcW;
 	output wire RegWriteW;
 	output wire MemtoRegW;
+
+	output wire CarryFlag;
 
 	wire [26:0] OutputDecode;
 	wire [26:0] InputExecute;
@@ -229,4 +232,7 @@ module controller (
 		.CondEx(CondExE),
 		.Flags(FlagsE)
 	);
+
+	assign CarryFlag = FlagsE[1];
+
 endmodule
