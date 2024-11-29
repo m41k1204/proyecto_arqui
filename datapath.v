@@ -8,13 +8,12 @@
 `include "mux8.v"
 `include "shift.v"
 
-
 module datapath (
 	clk,
 	reset,
 	RegSrc,
 	RegWrite,
-	RegWrite2,
+	RegWrite2W,
 	ImmSrc,
 	ALUSrc,
 	ALUControl,
@@ -27,14 +26,27 @@ module datapath (
 	ALUOutM,
 	WriteDataM,
 	ReadData,
-	ForwardAE, 
+	ForwardAE,
 	ForwardBE,
 	ForwardCE,
 	ForwardDE,
 	Match_1E_M,
     Match_1E_W,
-    Match_2E_M,
+    Match_1E_M0,
+	Match_1E_W0,
+	Match_2E_M,
     Match_2E_W,
+	Match_2E_M0,
+	Match_2E_W0,
+	Match_3E_M,
+    Match_3E_W,
+	Match_3E_M0,
+	Match_3E_W0,
+	Match_0E_M,
+    Match_0E_W,
+	Match_0E_M0,
+	Match_0E_W0,
+    Match_12D_E,
 	StallF,
 	StallD, 
 	FlushE,
@@ -47,7 +59,7 @@ module datapath (
 	Saturated,
 	Negate,
 	Unsigned,
-	Long,
+	NoShift,
 	MImmediateD,
 	MPreindexD,
 	MUpD,
@@ -60,7 +72,7 @@ module datapath (
 	input wire reset;
 	input wire [1:0] RegSrc;
 	input wire RegWrite;
-	input wire RegWrite2;
+	input wire RegWrite2W;
 	input wire [1:0] ImmSrc;
 	input wire ALUSrc;
 	input wire [3:0] ALUControl;
@@ -82,7 +94,6 @@ module datapath (
 	output wire [31:0] ResultW;
 	wire [3:0] RA1;
 	wire [3:0] RA2;
-
 	
 	wire [189:0] OutputDecode;
 	wire [189:0] InputExecute;
@@ -105,7 +116,7 @@ module datapath (
 	input wire Saturated;
 	input wire Negate;
 	input wire Unsigned;
-	input wire Long;
+	input wire NoShift;
 
 	input wire MImmediateD;
 	input wire MPreindexD;
@@ -134,10 +145,7 @@ module datapath (
 	output wire Match_0E_M0;
 	output wire Match_0E_W0;
 
-
-
 	output wire Match_12D_E;
-
 
 	wire [3:0] RA3;
 	wire [3:0] RA0;
@@ -160,6 +168,14 @@ module datapath (
 	wire [3:0] WA3E;
 	wire [31:0] ALUResultE;
 	wire [31:0] ALURes;
+
+	wire [1:0] ShiftTypeE;
+	wire ShiftSourceE;
+	wire [4:0] ShiftImmediateE;
+
+	wire [31:0] ShiftInputE;
+	wire [31:0] ShiftResultE;
+	wire [4:0] ShiftAmountE;
 
 	wire [3:0] WA3M;
 	wire [3:0] WA0E;
@@ -191,7 +207,9 @@ module datapath (
 	assign OutputDecode[139:108] = RD0;
 	assign OutputDecode[171:140] = RD3;
 	assign OutputDecode[175:172] = InstrD[11:8];
-
+	assign OutputDecode[177:176] = InstrD[6:5];
+	assign OutputDecode[178] = InstrD[4];
+	assign OutputDecode[183:179] = InstrD[11:7];
 
 	ff1to1 #(190) DecodeToExecuteReg(
 	       .i(OutputDecode),
@@ -208,6 +226,9 @@ module datapath (
 	assign RA2E = InputExecute[107:104];
 	assign RA3E = InputExecute[99:96];
 	assign RA0E = InputExecute[175:172];
+	assign ShiftTypeE = InputExecute[177:176];
+	assign ShiftSourceE = InputExecute[178];
+	assign ShiftImmediateE = InputExecute[183:179];
 
 	// logica para los Match Signals del Forwarding
 	assign Match_1E_M = (RA1E == WA3M);
@@ -274,8 +295,6 @@ module datapath (
 	assign Result2W = InputWriteBack[99:68];
 	assign WA0W = InputWriteBack[103:100];
 
-
-
 	mux2 #(32) pcmux(
 		.d0(PCPlus4),
 		.d1(ResultW),
@@ -289,7 +308,6 @@ module datapath (
 		.s(BranchTakenE),
 		.y(PC_)
 	);
-	
 
 	flopr #(32) pcreg(
 		.clk(clk),
@@ -317,16 +335,12 @@ module datapath (
 		.y(RA2)
 	);
 	
-	
 	//assign WA3W = 4'b0010;
 	
-	
-
-
 	regfile rf(
 		.clk(clk),
 		.we3(RegWrite),
-		.we0(RegWrite2),
+		.we0(RegWrite2W),
 		.ra0(RA0),
 		.ra1(RA1),
 		.ra2(RA2),
@@ -376,9 +390,8 @@ module datapath (
 		.d3(ALUOut2M),
 		.d4(Result2W),
 		.s(ForwardBE),
-		.y(WriteDataE)
+		.y(ShiftInputE)
 	);
-
 
 	mux8 forwardsrccmux(
 		.d0(InputExecute[139:108]),
@@ -407,8 +420,25 @@ module datapath (
 		.y(ALUResultE)
 	);
 
-	shift shift(
+	mux2 #(5) shiftamountmux(
+		.d0(ShiftImmediateE),
+		.d1(SrcCE[4:0]),
+		.s(ShiftSourceE),
+		.y(ShiftAmountE)
+	);
 
+	mux2 #(32) noshiftmux(
+		.d0(ShiftResultE),
+		.d1(ShiftInputE),
+		.s(NoShift),
+		.y(WriteDataE)
+	);
+
+	shift shift(
+		.ShiftInput(ShiftInputE),
+    	.ShiftAmount(ShiftAmountE),
+		.ShiftType(ShiftTypeE),
+		.ShiftResult(ShiftResultE)
 	);
 
 	alu alu(
@@ -422,7 +452,7 @@ module datapath (
 		.Saturated(Saturated),
 		.Negate(Negate),
 		.Unsigned(Unsigned),
-		.Result(ALUResultE),
+		.Result(ALURes),
 		.Result2(ALUResult2E),
 		.ALUFlags(ALUFlags)
 	);

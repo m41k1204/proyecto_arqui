@@ -35,8 +35,20 @@ module arm (
     wire MemToRegE;  
     wire Match_1E_M;
     wire Match_1E_W;
-    wire Match_2E_M;
+    wire Match_1E_M0;
+	wire Match_1E_W0;
+	wire Match_2E_M;
     wire Match_2E_W;
+	wire Match_2E_M0;
+	wire Match_2E_W0;
+	wire Match_3E_M;
+    wire Match_3E_W;
+	wire Match_3E_M0;
+	wire Match_3E_W0;
+	wire Match_0E_M;
+    wire Match_0E_W;
+	wire Match_0E_M0;
+	wire Match_0E_W0;
     wire Match_12D_E;
     wire [1:0] ForwardAE;
     wire [1:0] ForwardBE;
@@ -54,12 +66,15 @@ module arm (
 	wire Saturated;
 	wire Negate;
 	wire Unsigned;
-	wire Long;
+	wire NoShift;
 
 	wire PCSrcD;
 	wire PCSrcE;
 	wire PCSrcM;
 	wire PCSrcW;
+
+	wire RegWrite2M;
+	wire RegWrite2W;
 
 	controller c(
 		.clk(clk),
@@ -89,7 +104,9 @@ module arm (
 		.SaturatedE(Saturated),
 		.NegateE(Negate),
 		.UnsignedE(Unsigned),
-		.LongE(Long),
+		.NoShiftE(NoShift),
+		.RegWrite2W(RegWrite2W),
+		.RegWrite2M(RegWrite2M),
 		.CarryFlag(CarryFlag)
 	);
 
@@ -98,6 +115,7 @@ module arm (
 		.reset(reset),
 		.RegSrc(RegSrc),
 		.RegWrite(RegWriteW),
+		.RegWrite2W(RegWrite2W),
 		.ImmSrc(ImmSrc),
 		.ALUSrc(ALUSrc),
 		.ALUControl(ALUControl),
@@ -114,8 +132,20 @@ module arm (
 		.ForwardBE(ForwardBE),
 		.Match_1E_M(Match_1E_M),
 		.Match_1E_W(Match_1E_W),
+		.Match_1E_M0(Match_1E_M0),
+		.Match_1E_W0(Match_1E_W0),
 		.Match_2E_M(Match_2E_M),
 		.Match_2E_W(Match_2E_W),
+		.Match_2E_M0(Match_2E_M0),
+		.Match_2E_W0(Match_2E_W0),
+		.Match_3E_M(Match_3E_M),
+		.Match_3E_W(Match_3E_W),
+		.Match_3E_M0(Match_3E_M0),
+		.Match_3E_W0(Match_3E_W0),
+		.Match_0E_M(Match_0E_M),
+		.Match_0E_W(Match_0E_W),
+		.Match_0E_M0(Match_0E_M0),
+		.Match_0E_W0(Match_0E_W0),
 		.Match_12D_E(Match_12D_E),
 		.StallF(StallF),
 		.StallD(StallD), 
@@ -129,7 +159,7 @@ module arm (
 		.Saturated(Saturated),
 		.Negate(Negate),
 		.Unsigned(Unsigned),
-		.Long(Long),
+		.NoShift(NoShift),
 		.MImmediateD(Instr[25]),
 		.MPreindexD(Instr[24]),
 		.MUpD(Instr[23]),
@@ -141,9 +171,11 @@ module arm (
 	hazardunit hz(
 		.clk(clk),
 		.reset(reset),
-		.RegWriteW(RegWriteW), 
+		.RegWriteW(RegWriteW),
     	.RegWriteM(RegWriteM),
-    	.MemToRegE(MemToRegE),  
+		.RegWrite2W(RegWrite2W),
+		.RegWrite2M(RegWrite2M),
+    	.MemToRegE(MemToRegE),
     	.Match_1E_M(Match_1E_M),
     	.Match_1E_W(Match_1E_W),
     	.Match_2E_M(Match_2E_M),

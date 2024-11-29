@@ -30,7 +30,9 @@ module controller (
 	SaturatedE,
 	NegateE,
 	UnsignedE,
-	LongE,
+	NoShiftE,
+	RegWrite2M,
+	RegWrite2W,
 	CarryFlag
 );
 	input wire clk;
@@ -58,6 +60,7 @@ module controller (
 	wire NegateD;
 	wire UnsignedD;
 	wire LongD;
+	wire NoShiftD;
 
 	wire CondExE;
 	wire Branch;
@@ -80,11 +83,13 @@ module controller (
 	output wire SaturatedE;
 	output wire NegateE;
 	output wire UnsignedE;
-	output wire LongE;
+	wire LongE;
+	output wire NoShiftE;
 
 	output wire PCSrcM;
 	output wire RegWriteM;
 	wire MemToRegM;
+	output wire RegWrite2M;
 
 	output wire BranchTakenE;
 	output wire MemWriteM;
@@ -92,15 +97,16 @@ module controller (
 	output wire PCSrcW;
 	output wire RegWriteW;
 	output wire MemtoRegW;
+	output wire RegWrite2W;
 
 	output wire CarryFlag;
 
-	wire [26:0] OutputDecode;
-	wire [26:0] InputExecute;
-	wire [3:0] OutputExecute;
-	wire [3:0] InputMemory;
-	wire [2:0] OutputMemory;
-	wire [2:0] InputWriteBack;
+	wire [27:0] OutputDecode;
+	wire [27:0] InputExecute;
+	wire [4:0] OutputExecute;
+	wire [4:0] InputMemory;
+	wire [3:0] OutputMemory;
+	wire [3:0] InputWriteBack;
 	
 	wire [31:12] InstrD;
 	
@@ -133,7 +139,8 @@ module controller (
 		.Saturated(SaturatedD),
 		.Negate(NegateD),
 		.Unsigned(UnsignedD),
-		.Long(LongD)
+		.Long(LongD),
+		.NoShift(NoShiftD)
 	);
 
 	assign OutputDecode [0] = PCSrcD;
@@ -152,8 +159,9 @@ module controller (
 	assign OutputDecode [24] = SaturatedD;
 	assign OutputDecode [25] = NegateD;
 	assign OutputDecode [26] = LongD;
+	assign OutputDecode [27] = NoShiftD;
 	
-	ff1to1 #(27) DecodeToExecuteReg(
+	ff1to1 #(28) DecodeToExecuteReg(
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
@@ -178,14 +186,16 @@ module controller (
 	assign SaturatedE = InputExecute[24];
 	assign NegateE = InputExecute[25];
 	assign LongE = InputExecute[26];
+	assign NoShiftE = InputExecute[27];
 
 	assign BranchTakenE = (BranchE & CondExE);
 	assign OutputExecute[0] = (PCSrcE & CondExE);
-	assign OutputExecute[1] = RegWriteE & CondExE;
+	assign OutputExecute[1] = RegWriteE & CondExE & ~NoWriteE;
 	assign OutputExecute[2] = MemToRegE;
 	assign OutputExecute[3] = MemWriteE & CondExE;
+	assign OutputExecute[4] = LongE & CondExE;
 
-	ff1to1 #(4) ExecuteToMemoryReg(
+	ff1to1 #(5) ExecuteToMemoryReg(
 		.i(OutputExecute),
 		.j(InputMemory),
 		.clk(clk),
@@ -198,12 +208,14 @@ module controller (
 	assign RegWriteM = InputMemory[1];
 	assign MemToRegM = InputMemory[2];
 	assign MemWriteM = InputMemory[3];
+	assign RegWrite2M = InputMemory[4];
 
 	assign OutputMemory[0] = PCSrcM;
 	assign OutputMemory[1] = RegWriteM;
 	assign OutputMemory[2] = MemToRegM;
+	assign OutputMemory[3] = RegWrite2M;
 
-	ff1to1 #(3) MemoryToWriteBackReg(
+	ff1to1 #(4) MemoryToWriteBackReg(
 		.i(OutputMemory),
 		.j(InputWriteBack),
 		.clk(clk),
@@ -215,6 +227,7 @@ module controller (
 	assign PCSrcW = InputWriteBack[0];
 	assign RegWriteW = InputWriteBack[1];
 	assign MemtoRegW = InputWriteBack[2];
+	assign RegWrite2W = InputWriteBack[3];
 
 	condlogic cl(
 		.clk(clk),

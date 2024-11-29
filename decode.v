@@ -18,7 +18,8 @@ module decode (
 	Saturated,
 	Negate,
 	Unsigned,
-	Long
+	Long,
+	NoShift
 );
 	input wire [1:0] Op;
 	input wire [5:0] Funct;
@@ -39,6 +40,7 @@ module decode (
 	output wire Negate;
 	output wire Unsigned;
 	output wire Long;
+	output wire NoShift;
 
 	reg [9:0] controls;
 	output wire Branch;
@@ -62,11 +64,12 @@ module decode (
 
 	assign Carry = (Op == 2'b00) & (Funct[4:1] == 4'b0101 | Funct[4:1] == 4'b0110 | Funct[4:1] == 4'b0111);
 	assign NoWrite = (Op == 2'b00) & (Funct[4:0] == 5'b10001 | Funct[4:0] == 5'b10011 | Funct[4:1] == 4'b1010 | Funct[4:1] == 4'b1011);
-	assign Shift = (Op == 2'b00) & (Funct[4:0] == 4'b1101);
+	assign Shift = (Op == 2'b00) & (Funct[4:1] == 4'b1101);
 	assign Saturated = (Op == 2'b00) & (Funct[4:0] == 5'b10000 | Funct[4:0] == 5'b10010);
-	assign Negate = (Op == 2'b00) & (Funct[4:0] == 4'b1110 | Funct[4:0] == 4'b1111);
-	assign Unsigned = (Op == 2'b11) & ~(Funct[4:0] == 4'b0101 | Funct[4:0] == 4'b0110 | Funct[4:0] == 4'b1000);
-	assign Long = (Op == 2'b11) & (Funct[4:0] == 4'b0011 | Funct[4:0] == 4'b0100 | Funct[4:0] == 4'b0101 | Funct[4:0] == 4'b0110);
+	assign Negate = (Op == 2'b00) & (Funct[4:1] == 4'b1110 | Funct[4:1] == 4'b1111);
+	assign Unsigned = (Op == 2'b11) & ~(Funct[4:1] == 4'b0101 | Funct[4:1] == 4'b0110 | Funct[4:1] == 4'b1000);
+	assign Long = (Op == 2'b11) & (Funct[4:1] == 4'b0011 | Funct[4:1] == 4'b0100 | Funct[4:1] == 4'b0101 | Funct[4:1] == 4'b0110);
+	assign NoShift = (Op == 2'b11) & ~(Funct[4:1] == 4'b0000 | Funct[4:1] == 4'b0111 | Funct[4:1] == 4'b1000);
 
 	always @(*)
 		if (ALUOp) begin
