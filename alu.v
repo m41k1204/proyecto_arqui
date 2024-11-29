@@ -24,8 +24,6 @@ module alu(
     input wire Negate;
     input wire Unsigned;
 
-    wire sum_carry;
-    wire sub_carry;
     wire carry_val;
 
     output reg [31:0] Result;
@@ -36,14 +34,12 @@ module alu(
     wire [31:0] condinva;
     wire [31:0] condinvb;
     wire [32:0] sum;
-    wire [31:0] inv_a, inv_b, inv_c, signed_division, unsigned_division;
-    wire [63:0] signed_product, unsigned_product;
+    wire [31:0] inv_a, inv_b, signed_division;
+    wire [63:0] signed_product;
     assign condinva = ALUControl[3:0] == 4'b0101 ? ~a : a;
     assign condinvb = (ALUControl[3:0] == 4'b0001 | Negate) ? ~b : b;
     assign carry_val = ~((ALUControl[3:0] == 4'b0000) ^ (curr_carry_flag & Carry));
     assign sum = condinva + condinvb + carry_val;
-    assign sum_carry = 1'b0;
-    assign sub_carry = 1'b0;
     assign inv_a = a[31] ? ~a + 1 : a;
     assign inv_b = b[31] ? ~b + 1 : b;
 
