@@ -6,22 +6,23 @@ module demo(
     clk,
     rst,
     out, 
-    enable
+    enable,
+    real_clk
 );
 
 input wire clk;
-wire real_clk;
+output wire real_clk;
 input wire rst;
-wire ResultW;
+wire [31:0] ResultW;
 wire WriteData;
 wire DataAdr;
 wire MemWriteM;
 
-output wire out;
-output wire enable;
+output wire [6:0] out;
+output wire [3:0] enable;
 
 
-clkdivider clk_divider(
+clk_divider clk_divider(
     .clk(clk),
     .rst(rst),
     .led(real_clk)
@@ -39,7 +40,7 @@ top top(
 basysdecoder decoder(
     .out0(out),
     .enable(enable),
-    .in(ResultW)
+    .in(ResultW[3:0])
 );
 
 endmodule

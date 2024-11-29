@@ -9,7 +9,8 @@ module arm (
 	MemWriteM,
 	ALUResult,
 	WriteData,
-	ReadData
+	ReadData,
+	ResultW
 );
 	input wire clk;
 	input wire reset;
@@ -26,6 +27,8 @@ module arm (
 	wire [1:0] RegSrc;
 	wire [1:0] ImmSrc;
 	wire [3:0] ALUControl;
+	
+	output wire ResultW;
 
 	wire RegWriteW;
     wire RegWriteM;
@@ -98,7 +101,8 @@ module arm (
 		.StallD(StallD), 
 		.FlushE(FlushE),
 		.FlushD(FlushD),
-		.BranchTakenE(BranchTakenE)
+		.BranchTakenE(BranchTakenE),
+		.ResultW(ResultW)
 	);
 
 	hazardunit hz(
