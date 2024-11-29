@@ -22,8 +22,8 @@ module clk_divider_internal(
     output led
     );
  
-wire [18:0] din;
-wire [18:0] clkdiv; 
+wire [10:0] din;
+wire [10:0] clkdiv; 
  
 dff dff_inst0 (
     .clk(clk),
@@ -34,7 +34,7 @@ dff dff_inst0 (
 
 genvar i;
 generate
-for (i = 1; i < 18+1; i=i+1) 
+for (i = 1; i < 10+1; i=i+1) 
 begin : dff_gen_label
     dff dff_inst (
         .clk(clkdiv[i-1]),
@@ -47,6 +47,6 @@ endgenerate
 
 assign din = ~clkdiv;
  
-assign led = clkdiv[18];
+assign led = clkdiv[10];
  
 endmodule
