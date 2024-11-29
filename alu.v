@@ -2,6 +2,7 @@ module alu(
     a,
     b,
     c,
+    d,
     ALUControl,
     Carry,
     curr_carry_flag,
@@ -9,12 +10,13 @@ module alu(
     Negate,
     Unsigned,
     Result,
-    HiResult,
+    Result2,
     ALUFlags
 );
     input wire [31:0] a;
     input wire [31:0] b;
-    input wire [63:0] c;
+    input wire [31:0] c;
+    input wire [31:0] d;
     input wire [3:0] ALUControl;
     input wire Carry;
     input wire curr_carry_flag;
@@ -23,7 +25,7 @@ module alu(
     input wire Unsigned;
 
     output reg [31:0] Result;
-    output reg [31:0] HiResult; 
+    output reg [31:0] Result2; 
     output wire [4:0] ALUFlags;
 
     wire  neg, zero, carry_flag, overflow, saturated_flag;
@@ -63,17 +65,17 @@ module alu(
         4'b0101: Result = b - a;
         4'b0110: 
         if(Unsigned) begin
-            {HiResult, Result} = a * b;
+            {Result2, Result} = a * b;
         end
         else begin
-            {HiResult, Result} = signed_product;
+            {Result2, Result} = signed_product;
         end
         4'b0111:
         if(Unsigned) begin
-            {HiResult, Result} = c + a * b;
+            {Result2, Result} = c + a * b;
         end
         else begin
-            {HiResult, Result} = c + signed_product;
+            {Result2, Result} = c + signed_product;
         end
         4'b1000: Result = c - a * b;
         4'b1001:
