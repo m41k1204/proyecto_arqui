@@ -101,8 +101,8 @@ module controller (
 
 	output wire CarryFlag;
 
-	wire [27:0] OutputDecode;
-	wire [27:0] InputExecute;
+	wire [28:0] OutputDecode;
+	wire [28:0] InputExecute;
 	wire [4:0] OutputExecute;
 	wire [4:0] InputMemory;
 	wire [3:0] OutputMemory;
@@ -158,10 +158,11 @@ module controller (
 	assign OutputDecode [23] = ShiftD;
 	assign OutputDecode [24] = SaturatedD;
 	assign OutputDecode [25] = NegateD;
-	assign OutputDecode [26] = LongD;
-	assign OutputDecode [27] = NoShiftD;
+	assign OutputDecode [26] = UnsignedD;
+	assign OutputDecode [27] = LongD;
+	assign OutputDecode [28] = NoShiftD;
 	
-	ff1to1 #(28) DecodeToExecuteReg(
+	ff1to1 #(29) DecodeToExecuteReg(
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
@@ -185,8 +186,9 @@ module controller (
 	assign ShiftE = InputExecute[23];
 	assign SaturatedE = InputExecute[24];
 	assign NegateE = InputExecute[25];
-	assign LongE = InputExecute[26];
-	assign NoShiftE = InputExecute[27];
+	assign UnsignedE = InputExecute[26];
+	assign LongE = InputExecute[27];
+	assign NoShiftE = InputExecute[28];
 
 	assign BranchTakenE = (BranchE & CondExE);
 	assign OutputExecute[0] = (PCSrcE & CondExE);
