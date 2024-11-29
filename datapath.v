@@ -147,8 +147,8 @@ module datapath (
 
 	output wire Match_12D_E;
 
-	wire [3:0] RA3;
-	wire [3:0] RA0;
+	// wire [3:0] RA3;
+	// wire [3:0] RA0;
 	wire [3:0] WA0W;
 	wire [31:0] RD3;
 	wire [31:0] RD0;
@@ -226,6 +226,7 @@ module datapath (
 	assign RA2E = InputExecute[107:104];
 	assign RA3E = InputExecute[99:96];
 	assign RA0E = InputExecute[175:172];
+	assign WA0E = InputExecute[175:172];
 	assign ShiftTypeE = InputExecute[177:176];
 	assign ShiftSourceE = InputExecute[178];
 	assign ShiftImmediateE = InputExecute[183:179];
@@ -341,10 +342,10 @@ module datapath (
 		.clk(clk),
 		.we3(RegWrite),
 		.we0(RegWrite2W),
-		.ra0(RA0),
+		.ra0(InstrD[11:8]),
 		.ra1(RA1),
 		.ra2(RA2),
-		.ra3(RA3),
+		.ra3(InstrD[15:12]),
 		.wa3(WA3W),
 		.wd3(ResultW),
 		.r15(PCPlus4),

@@ -50,8 +50,11 @@ module arm (
 	wire Match_0E_M0;
 	wire Match_0E_W0;
     wire Match_12D_E;
-    wire [1:0] ForwardAE;
-    wire [1:0] ForwardBE;
+    wire [2:0] ForwardAE;
+    wire [2:0] ForwardBE;
+	wire [2:0] ForwardCE;
+	wire [2:0] ForwardDE;
+	
     wire StallF;
     wire StallD;
     wire FlushE;
@@ -130,6 +133,8 @@ module arm (
 		.ReadData(ReadData),
 		.ForwardAE(ForwardAE), 
 		.ForwardBE(ForwardBE),
+		.ForwardCE(ForwardCE),
+		.ForwardDE(ForwardDE),
 		.Match_1E_M(Match_1E_M),
 		.Match_1E_W(Match_1E_W),
 		.Match_1E_M0(Match_1E_M0),
@@ -200,6 +205,8 @@ module arm (
 		.BranchTakenE(BranchTakenE),
 		.ForwardAE(ForwardAE),
     	.ForwardBE(ForwardBE),
+		.ForwardCE(ForwardCE),
+		.ForwardDE(ForwardDE),
     	.StallF(StallF),
     	.StallD(StallD),
     	.FlushE(FlushE),
