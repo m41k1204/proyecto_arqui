@@ -17,6 +17,7 @@ module datapath (
 	ALUControl,
 	MemtoReg,
 	PCSrc,
+	CarryFlag,
 	ALUFlags,
 	PC,
 	InstrF,
@@ -53,6 +54,7 @@ module datapath (
 	input wire [3:0] ALUControl;
 	input wire MemtoReg;
 	input wire PCSrc;
+	input wire CarryFlag;
 	output wire [4:0] ALUFlags;
 	output wire [31:0] PC;
 	input wire [31:0] InstrF;
@@ -284,7 +286,7 @@ module datapath (
 		.c(SrcCE),
 		.ALUControl(ALUControl),
 		.Carry(Carry),
-		.curr_carry_flag(CarryFlagE),
+		.curr_carry_flag(CarryFlag),
 		.Saturated(Saturated),
 		.Negate(Negate),
 		.Unsigned(Unsigned),

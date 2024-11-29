@@ -48,7 +48,7 @@ module alu(
         4'b0000 | 4'b0001 | 4'b0101: 
         if(saturated_flag) begin
             if(sum[31]) begin
-                Result = 32'hefffffff;
+                Result =32'hefffffff;
             end
             else begin
                 Result = 32'h80000000;

@@ -46,6 +46,8 @@ module arm (
 	wire BranchTakenE;
 	wire FlushD;
 
+	wire CarryFlag;
+
 	wire Carry;
 	wire NoWrite;
 	wire Shift;
@@ -87,7 +89,8 @@ module arm (
 		.SaturatedE(Saturated),
 		.NegateE(Negate),
 		.UnsignedE(Unsigned),
-		.LongE(Long)
+		.LongE(Long),
+		.CarryFlag(CarryFlag)
 	);
 
 	datapath dp(
@@ -100,6 +103,7 @@ module arm (
 		.ALUControl(ALUControl),
 		.MemtoReg(MemtoReg),
 		.PCSrc(PCSrcW),
+		.CarryFlag(CarryFlag),
 		.ALUFlags(ALUFlags),
 		.PC(PC),
 		.InstrF(Instr),
