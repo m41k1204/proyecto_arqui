@@ -39,7 +39,7 @@ module alu(
     wire [63:0] signed_product, unsigned_product;
     assign condinva = ALUControl[3:0] == 4'b0101 ? ~a : a;
     assign condinvb = (ALUControl[3:0] == 4'b0001 | Negate) ? ~b : b;
-    assign sum = condinva + condinvb;
+    assign sum = condinva + condinvb + ALUControl[0];
     assign sum_carry = 1'b0;
     assign sub_carry = 1'b0;
     assign inv_a = a[31] ? ~a + 1 : a;
