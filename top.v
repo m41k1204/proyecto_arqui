@@ -8,17 +8,18 @@ module top (
 	WriteData,
 	DataAdr,
 	MemWriteM,
-	ResultW
+	ResultW,
+	PC
 );
 	input wire clk;
 	input wire reset;
 	output wire [31:0] WriteData;
 	output wire [31:0] DataAdr;
 	output wire MemWriteM;
-	wire [31:0] PC;
+	output wire [31:0] PC;
 	wire [31:0] Instr;
 	wire [31:0] ReadData;
-	output wire ResultW;
+	output wire [31:0] ResultW;
 	arm arm(
 		.clk(clk),
 		.reset(reset),

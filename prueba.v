@@ -1,6 +1,6 @@
 `timescale 1ns / 1ps
 
-module basysdecoder (
+module prueba (
     output reg [6:0] out0,     // 7-segment display output
     output wire [3:0] enable,  // Enable for the display
     input wire clk,            

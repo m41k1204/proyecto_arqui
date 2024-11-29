@@ -28,7 +28,7 @@ module arm (
 	wire [1:0] ImmSrc;
 	wire [3:0] ALUControl;
 	
-	output wire ResultW;
+	output wire [31:0] ResultW;
 
 	wire RegWriteW;
     wire RegWriteM;

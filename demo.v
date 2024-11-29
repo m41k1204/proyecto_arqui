@@ -13,6 +13,7 @@ module demo (
     wire [31:0] ResultW;   // Result from processor
     wire WriteData, DataAdr, MemWriteM;
     wire internal_clk;
+    wire [31:0] PC;
 
     // Clock divider for internal FSM clock
     clk_divider_internal internal_clk_divider (
@@ -28,17 +29,18 @@ module demo (
         .WriteData(WriteData),
         .DataAdr(DataAdr),
         .MemWriteM(MemWriteM),
-        .ResultW(ResultW)
+        .ResultW(ResultW),
+        .PC(PC)
     );
 
     // Basys decoder with FSM
     basysdecoder decoder (
         .out0(out),
         .enable(enable),
-        .clk(internal_clk),
+        .internal_clk(internal_clk),
         .real_clk(real_clk),
-        .rst(rst),
-        .ResultW(ResultW[15:0]) 
+        .ResultW(ResultW[15:0]),
+        .PC(PC[7:0])
     );
 
     // Real clock for processor
