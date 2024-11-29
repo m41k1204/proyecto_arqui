@@ -1,46 +1,51 @@
-`include "top.v"
 `include "clk_div_pipelined.v"
-`include "basysdecoder.v"
+`include "top.v"
 
-module demo(
-    clk,
-    rst,
-    out, 
-    enable,
-    real_clk
+
+module demo (
+    input wire clk,
+    input wire rst,
+    output wire [6:0] out,
+    output wire [3:0] enable,
+    output wire real_clk
 );
 
-input wire clk;
-output wire real_clk;
-input wire rst;
-wire [31:0] ResultW;
-wire WriteData;
-wire DataAdr;
-wire MemWriteM;
+    wire [31:0] ResultW;   // Result from processor
+    wire WriteData, DataAdr, MemWriteM;
+    wire internal_clk;
 
-output wire [6:0] out;
-output wire [3:0] enable;
+    // Clock divider for internal FSM clock
+    clk_divider_internal internal_clk_divider (
+        .clk(clk),
+        .rst(rst),
+        .led(internal_clk)
+    );
 
+    // Pipelined processor
+    top top (
+        .clk(real_clk),
+        .reset(rst),
+        .WriteData(WriteData),
+        .DataAdr(DataAdr),
+        .MemWriteM(MemWriteM),
+        .ResultW(ResultW)
+    );
 
-clk_divider clk_divider(
-    .clk(clk),
-    .rst(rst),
-    .led(real_clk)
-);
+    // Basys decoder with FSM
+    basysdecoder decoder (
+        .out0(out),
+        .enable(enable),
+        .clk(internal_clk),
+        .real_clk(real_clk),
+        .rst(rst),
+        .ResultW(ResultW[15:0]) 
+    );
 
-top top(
-    .clk(real_clk),
-    .reset(rst),
-    .WriteData(WriteData),
-    .DataAdr(DataAdr),
-    .MemWriteM(MemWriteM),
-    .ResultW(ResultW)
-);
-
-basysdecoder decoder(
-    .out0(out),
-    .enable(enable),
-    .in(ResultW[3:0])
-);
+    // Real clock for processor
+    clk_divider clk_divider (
+        .clk(clk),
+        .rst(rst),
+        .led(real_clk)
+    );
 
 endmodule

@@ -1,31 +1,54 @@
 `timescale 1ns / 1ps
 
 module basysdecoder (
-    output reg [6:0] out0,     // 7-segment display output
-    output wire [3:0] enable,  // Enable for the display
-    input wire clk,            
-    input wire rst             
+    output reg [6:0] out0,        
+    output wire [3:0] enable,      
+    input wire clk,               
+    input wire real_clk,         
+    input wire [15:0] ResultW 
 );
 
-    reg [3:0] count;  
+    reg [1:0] state;             
+    reg [3:0] digito;            
+    reg activo;                 
 
-    assign enable = 4'b1110;
+    assign enable = 4'b0000;
 
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
-            count <= 4'b0000; 
-        end else begin
-            if (count == 4'b1111) begin
-                count <= 4'b0000; 
-            end else begin
-                count <= count + 4'b0001; 
-            end
+    localparam S0 = 2'b00;       
+    localparam S1 = 2'b01;       
+    localparam S2 = 2'b10;       
+    localparam S3 = 2'b11;       
+
+    always @(posedge clk or posedge real_clk) begin
+        if (real_clk)
+        begin
+            state <= S0;
+            activo <= 1;
         end
+        else if (activo) 
+        begin
+            case (state)
+                S0: state <= S1;
+                S1: state <= S2;
+                S2: state <= S3;
+                S3: activo <= 0; 
+            endcase
+        end 
+         
     end
 
-    // Decoder logic for 7-segment display
     always @(*) begin
-        case (count)
+        case (state)
+            S0: digito = ResultW[3:0];    
+            S1: digito = ResultW[7:4];    
+            S2: digito = ResultW[11:8];   
+            S3: digito = ResultW[15:12];  
+            default: digito = 4'b0000;
+        endcase
+    end
+
+    always @(*) begin
+        case (digito)
             4'b0000: out0 = 7'b0000001; // 0
             4'b0001: out0 = 7'b1001111; // 1
             4'b0010: out0 = 7'b0010010; // 2
