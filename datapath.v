@@ -5,13 +5,14 @@
 `include "regfile.v"
 `include "extend.v"
 `include "alu.v"
-`include "mux4.v"
+`include "mux8.v"
 
 module datapath (
 	clk,
 	reset,
 	RegSrc,
 	RegWrite,
+	RegWrite2,
 	ImmSrc,
 	ALUSrc,
 	ALUControl,
@@ -26,6 +27,8 @@ module datapath (
 	ReadData,
 	ForwardAE, 
 	ForwardBE,
+	ForwardCE,
+	ForwardDE,
 	Match_1E_M,
     Match_1E_W,
     Match_2E_M,
@@ -49,6 +52,7 @@ module datapath (
 	input wire reset;
 	input wire [1:0] RegSrc;
 	input wire RegWrite;
+	input wire RegWrite2;
 	input wire [1:0] ImmSrc;
 	input wire ALUSrc;
 	input wire [3:0] ALUControl;
@@ -70,12 +74,17 @@ module datapath (
 	output wire [31:0] ResultW;
 	wire [3:0] RA1;
 	wire [3:0] RA2;
-	wire [107:0] OutputDecode;
-	wire [107:0] InputExecute;
+
+	
+	wire [189:0] OutputDecode;
+	wire [189:0] InputExecute;
 
 	wire [31:0] PC_;
-	input wire [1:0] ForwardAE;
-	input wire [1:0] ForwardBE;
+	input wire [2:0] ForwardAE;
+	input wire [2:0] ForwardBE;
+	input wire [2:0] ForwardCE;
+	input wire [2:0] ForwardDE;
+
 	input wire BranchTakenE;
 	input wire StallF; 
 	input wire StallD; 
@@ -92,12 +101,41 @@ module datapath (
 	
 	output wire Match_1E_M;
     output wire Match_1E_W;
-    output wire Match_2E_M;
+    output wire Match_1E_M0;
+	output wire Match_1E_W0;
+
+	output wire Match_2E_M;
     output wire Match_2E_W;
+	output wire Match_2E_M0;
+	output wire Match_2E_W0;
+
+	output wire Match_3E_M;
+    output wire Match_3E_W;
+	output wire Match_3E_M0;
+	output wire Match_3E_W0;
+
+	output wire Match_0E_M;
+    output wire Match_0E_W;
+	output wire Match_0E_M0;
+	output wire Match_0E_W0;
+
+
 
 	output wire Match_12D_E;
 
 
+	wire [3:0] RA3;
+	wire [3:0] RA0;
+	wire [3:0] WA0W;
+	wire [31:0] RD3;
+	wire [31:0] RD0;
+	wire [31:0] Result2W;
+	wire [31:0] ALUResult2E;
+	wire [31:0] SrcCE;
+	wire [31:0] SrcDE;
+
+	wire [3:0] RA0E;
+	wire [3:0] RA3E; 
 	wire [3:0] RA1E;
 	wire [3:0] RA2E;
 	wire [31:0] SrcAE;
@@ -108,12 +146,16 @@ module datapath (
 	wire [31:0] ALUResultE;
 
 	wire [3:0] WA3M;
+	wire [3:0] WA0E;
+	wire [3:0] WA0M;
 	
-	wire [67:0] OutputExecute;
-	wire [67:0] InputMemory;
+	wire [31:0] ALUOut2M;
+
+	wire [103:0] OutputExecute;
+	wire [103:0] InputMemory;
 	
-	wire [67:0] OutputMemory;
-	wire [67:0] InputWriteBack;
+	wire [103:0] OutputMemory;
+	wire [103:0] InputWriteBack;
 		
 
 
@@ -132,10 +174,12 @@ module datapath (
 	assign OutputDecode[99:96] = InstrD[15:12];
 	assign OutputDecode[103:100] = RA1;
 	assign OutputDecode[107:104] = RA2;
+	assign OutputDecode[139:108] = RD0;
+	assign OutputDecode[171:140] = RD3;
+	assign OutputDecode[175:172] = InstrD[11:8];
 
 
-
-	ff1to1 #(108) DecodeToExecuteReg(
+	ff1to1 #(190) DecodeToExecuteReg(
 	       .i(OutputDecode),
 	       .j(InputExecute),
 	       .clk(clk),
@@ -149,12 +193,29 @@ module datapath (
 	assign WA3E = InputExecute[99:96];
 	assign RA1E = InputExecute[103:100];
 	assign RA2E = InputExecute[107:104];
+	assign RA3E = InputExecute[99:96];
+	assign RA0E = InputExecute[175:172];
 
 	// logica para los Match Signals del Forwarding
 	assign Match_1E_M = (RA1E == WA3M);
 	assign Match_1E_W = (RA1E == WA3W);
+	assign Match_1E_M0 = (RA1E == WA0M);
+	assign Match_1E_W0 = (RA1E == WA0W);
+
 	assign Match_2E_M = (RA2E == WA3M);
 	assign Match_2E_W = (RA2E == WA3W);
+	assign Match_2E_M0 = (RA2E == WA0M);
+	assign Match_2E_W0 = (RA2E == WA0W);
+
+	assign Match_3E_M = (RA3E == WA3M);
+	assign Match_3E_W = (RA3E == WA3W);
+	assign Match_3E_M0 = (RA3E == WA0M);
+	assign Match_3E_W0 = (RA3E == WA0W);
+
+	assign Match_0E_M = (RA0E == WA3M);
+	assign Match_0E_W = (RA0E == WA3W);
+	assign Match_0E_M0 = (RA0E == WA0M);
+	assign Match_0E_W0 = (RA0E == WA0W);
 
 	// logica para el Match Signaling del Stalling
 	assign Match_12D_E = (RA1 == WA3E) || (RA2 == WA3E);
@@ -162,8 +223,10 @@ module datapath (
 	assign OutputExecute[31:0] = ALUResultE;
 	assign OutputExecute[63:32] = WriteDataE;
 	assign OutputExecute[67:64] = InputExecute[99:96];
+	assign OutputExecute[99:68] = ALUResult2E;
+	assign OutputExecute[103:100] = WA0E;
 	
-	ff1to1 #(68) ExecuteToMemoryReg(
+	ff1to1 #(104) ExecuteToMemoryReg(
 	   .i(OutputExecute),
 	   .j(InputMemory),
 	   .clk(clk),
@@ -175,12 +238,16 @@ module datapath (
 	assign ALUOutM = InputMemory[31:0];
 	assign WriteDataM = InputMemory[63:32];
 	assign WA3M = InputMemory[67:64];
+	assign ALUOut2M = InputMemory[99:68];
+	assign WA0M = InputMemory[103:100];
 	
 	assign OutputMemory[31:0] = ReadData;
 	assign OutputMemory[63:32] = ALUOutM;
 	assign OutputMemory[67:64] = WA3M;
+	assign OutputMemory[99:68] = ALUOut2M;
+	assign OutputMemory[103:100] = WA0M;
 	
-	ff1to1 #(68) MemoryToWriteBackReg (
+	ff1to1 #(104) MemoryToWriteBackReg (
 	   .i(OutputMemory),
 	   .j(InputWriteBack),
 	   .clk(clk),
@@ -188,7 +255,14 @@ module datapath (
 	   .clear(1'b0),
 	   .enable(1'b1)
 	);
-	
+
+	wire [3:0] WA3W;
+	assign WA3W = InputWriteBack[67:64];
+	assign Result2W = InputWriteBack[99:68];
+	assign WA0W = InputWriteBack[103:100];
+
+
+
 	mux2 #(32) pcmux(
 		.d0(PCPlus4),
 		.d1(ResultW),
@@ -230,21 +304,29 @@ module datapath (
 		.y(RA2)
 	);
 	
-	wire [3:0] WA3W;
-	assign WA3W = InputWriteBack[67:64];
+	
 	//assign WA3W = 4'b0010;
 	
 	
+
+
 	regfile rf(
 		.clk(clk),
 		.we3(RegWrite),
+		.we0(RegWrite2),
+		.ra0(RA0),
 		.ra1(RA1),
 		.ra2(RA2),
+		.ra3(RA3),
 		.wa3(WA3W),
 		.wd3(ResultW),
 		.r15(PCPlus4),
+		.wa0(WA0W),
+		.wd0(Result2W),
+		.rd0(RD0),
 		.rd1(SrcA),
-		.rd2(WriteData)
+		.rd2(WriteData),
+		.rd3(RD3)
 	);
 	mux2 #(32) resmux(
 		.d0(InputWriteBack[63:32]),
@@ -264,26 +346,52 @@ module datapath (
 		.y(SrcBE)
 	);
 
-	mux4 forwardsrcamux(
+	mux8 forwardsrcamux(
 		.d0(InputExecute[31:0]),
 		.d1(ResultW),
 		.d2(ALUOutM),
+		.d3(ALUOut2M),
+		.d4(Result2W),
 		.s(ForwardAE),
 		.y(SrcAE)
 	);
 
-	mux4 forwardsrcbmux(
+	mux8 forwardsrcbmux(
 		.d0(InputExecute[63:32]),
 		.d1(ResultW),
 		.d2(ALUOutM),
+		.d3(ALUOut2M),
+		.d4(Result2W),
 		.s(ForwardBE),
 		.y(WriteDataE)
 	);
+
+	mux8 forwardsrccmux(
+		.d0(InputExecute[139:108]),
+		.d1(ResultW),
+		.d2(ALUOutM),
+		.d3(ALUOut2M),
+		.d4(Result2W),
+		.s(ForwardCE),
+		.y(SrcCE)
+	);
+
+	mux8 forwardsrcdmux(
+		.d0(InputExecute[171:140]),
+		.d1(ResultW),
+		.d2(ALUOutM),
+		.d3(ALUOut2M),
+		.d4(Result2W),
+		.s(ForwardDE),
+		.y(SrcDE)
+	);
+
 
 	alu alu(
 		.a(SrcAE),
 		.b(SrcBE),
 		.c(SrcCE),
+		.d(SrcDE),
 		.ALUControl(ALUControl),
 		.Carry(Carry),
 		.curr_carry_flag(CarryFlag),
@@ -291,7 +399,7 @@ module datapath (
 		.Negate(Negate),
 		.Unsigned(Unsigned),
 		.Result(ALUResultE),
-		.HiResult(ALUHiResultE),
+		.Result2(ALUResult2E),
 		.ALUFlags(ALUFlags)
 	);
 endmodule
