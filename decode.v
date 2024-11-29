@@ -47,7 +47,7 @@ module decode (
 	wire ALUOp;
 	always @(*)
 		casex (Op)
-			2'b00 || 2'b11:
+			2'b00 , 2'b11:
 				if (Funct[5])
 					controls = 10'b0000101001;
 				else
