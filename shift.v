@@ -11,9 +11,9 @@ module shift(
 
     always @ (*) 
         case (ShiftType)
-            2'b00: assign ShiftResult = ShiftInput << ShiftAmount;
-            2'b01: assign ShiftResult = ShiftInput >> ShiftAmount;
-            2'b10: assign ShiftResult = ShiftInput >>> ShiftAmount;
-            2'b11: assign ShiftResult = (ShiftInput >> ShiftAmount) | (ShiftInput << (32 - ShiftAmount));
+            2'b00: ShiftResult = ShiftInput << ShiftAmount;
+            2'b01: ShiftResult = ShiftInput >> ShiftAmount;
+            2'b10: ShiftResult = ShiftInput >>> ShiftAmount;
+            2'b11: ShiftResult = (ShiftInput >> ShiftAmount) | (ShiftInput << (32 - ShiftAmount));
     endcase
 endmodule
