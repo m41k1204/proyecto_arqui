@@ -30,6 +30,7 @@ module controller (
 	SaturatedE,
 	NegateE,
 	UnsignedE,
+	LongE,
 	NoShiftE,
 	RegWrite2M,
 	RegWrite2W,
@@ -83,7 +84,7 @@ module controller (
 	output wire SaturatedE;
 	output wire NegateE;
 	output wire UnsignedE;
-	wire LongE;
+	output wire LongE;
 	output wire NoShiftE;
 
 	output wire PCSrcM;

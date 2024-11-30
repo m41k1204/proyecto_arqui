@@ -9,6 +9,7 @@ module alu(
     Saturated,
     Negate,
     Unsigned,
+    Long,
     Result,
     Result2,
     ALUFlags
@@ -23,6 +24,7 @@ module alu(
     input wire Saturated;
     input wire Negate;
     input wire Unsigned;
+    input wire Long;
 
     wire carry_val;
 
@@ -36,6 +38,8 @@ module alu(
     wire [32:0] sum;
     wire [31:0] inv_a, inv_b, signed_division;
     wire [63:0] signed_product;
+    wire [63:0] accumulate;
+
     assign condinva = ALUControl[3:0] == 4'b0101 ? ~a : a;
     assign condinvb = (ALUControl[3:0] == 4'b0001 | Negate) ? ~b : b;
     assign carry_val = ~((ALUControl[3:0] == 4'b0000) ^ (curr_carry_flag & Carry));
@@ -45,6 +49,8 @@ module alu(
 
     assign signed_division = a[31] ^ b[31] ? ~(inv_a / inv_b) + 1 : (inv_a / inv_b);
     assign signed_product = a[31] ^ b[31] ? ~(inv_a * inv_b) + 1 : (inv_a * inv_b);
+
+    assign accumulate = Long ? {c, d} : {32'h00000000, c};
     
     always @(*)
     begin
@@ -74,10 +80,10 @@ module alu(
         end
         4'b0111:
         if(Unsigned) begin
-            {Result2, Result} = c + a * b;
+            {Result2, Result} = accumulate + a * b;
         end
         else begin
-            {Result2, Result} = c + signed_product;
+            {Result2, Result} = accumulate + signed_product;
         end
         4'b1000: Result = c - a * b;
         4'b1001:
