@@ -2,40 +2,46 @@
 
 module basysdecoder (
     output reg [6:0] out0,        
-    output wire [3:0] enable,      
-    input wire clk,               
+    output reg [3:0] enable,      
+    input wire internal_clk,               
     input wire real_clk,         
     input wire [15:0] ResultW 
 );
 
     reg [1:0] state;             
     reg [3:0] digito;            
-    reg activo;                 
 
-    assign enable = 4'b0000;
+    parameter S0 = 2'b00;       
+    parameter S1 = 2'b01;       
+    parameter S2 = 2'b10;       
+    parameter S3 = 2'b11;       
 
-    localparam S0 = 2'b00;       
-    localparam S1 = 2'b01;       
-    localparam S2 = 2'b10;       
-    localparam S3 = 2'b11;       
-
-    always @(posedge clk or posedge real_clk) begin
-        if (real_clk)
-        begin
-            state <= S0;
-            activo <= 1;
-        end
-        else if (activo) 
+    always @ (posedge real_clk)
+        state <= S0;
+    
+    always @(posedge fsm_clk) 
         begin
             case (state)
-                S0: state <= S1;
-                S1: state <= S2;
-                S2: state <= S3;
-                S3: activo <= 0; 
+                S0: begin 
+                    state <= S1;
+                    enable <= 4'b1110;
+                end
+                S1: begin 
+                    state <= S2;
+                    enable <= 4'b1101;
+                end
+                S2: begin 
+                    state <= S3;
+                    enable <= 4'b1011;
+                end
+                S3: begin 
+                    state <= S4;
+                    enable <= 4'b0111;
+                end 
             endcase
         end 
          
-    end
+    
 
     always @(*) begin
         case (state)
