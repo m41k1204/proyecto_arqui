@@ -59,3 +59,24 @@ RAM[5] = 32'he24ac00a;
 RAM[6] = 32'hec450a0c;
 RAM[7] = 32'hece9100a;
 RAM[8] = 32'hed09200c;
+
+mov r0, #4
+	mov r2, #6
+	str r0, [r2]
+	ldr r3, [r2]
+	b end
+	mov r4, #7
+	end:
+	mov r5, #5
+
+
+RAM[0] = 32'he3a02014;
+RAM[1] = 32'he3a04009;
+RAM[2] = 32'he3a05008;
+RAM[3] = 32'hec049005;
+RAM[4] = 32'he3a0a004;
+RAM[5] = 32'hec24b20a;
+RAM[6] = 32'he24ac00a;
+RAM[7] = 32'hec450a0c;
+RAM[8] = 32'hece9100a;
+RAM[9] = 32'hed09200c;
