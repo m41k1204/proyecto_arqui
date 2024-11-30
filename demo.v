@@ -7,7 +7,9 @@ module demo (
     input wire rst,
     output wire [6:0] out,
     output wire [3:0] enable,
-    output wire real_clk
+    output wire real_clk,
+    output wire RegWriteW
+
 );
 
     wire [31:0] ResultW;   // Result from processor
@@ -30,7 +32,13 @@ module demo (
         .DataAdr(DataAdr),
         .MemWriteM(MemWriteM),
         .ResultW(ResultW),
-        .PC(PC)
+        .PC(PC),
+        .Result2W(Result2W),
+        .BranchTakenE(BranchTakenE),
+        .ForwardA(ForwardA),
+        .ForwardB(ForwardB),
+        .RegWriteW(RegWriteW)
+        
     );
 
     // Basys decoder with FSM

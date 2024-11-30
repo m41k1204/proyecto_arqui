@@ -13,8 +13,10 @@ module top (
 	Result2W,
 	BranchTakenE,
 	ForwardA,
-	ForwardB
+	ForwardB,
+	RegWriteW
 );
+    output wire RegWriteW;
 	input wire clk;
 	input wire reset;
 	output wire [31:0] WriteData;
@@ -41,7 +43,8 @@ module top (
 		.Result2W(Result2W),
 		.BranchTakenE(BranchTakenE),
 		.ForwardA(ForwardA),
-		.ForwardB(ForwardB)
+		.ForwardB(ForwardB),
+		.RegWriteW(RegWriteW)
 	);
 	imem imem(
 		.a(PC),

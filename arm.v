@@ -14,7 +14,8 @@ module arm (
 	Result2W,
 	BranchTakenE,
 	ForwardA,
-	ForwardB
+	ForwardB,
+	RegWriteW
 );
 	input wire clk;
 	input wire reset;
@@ -38,7 +39,7 @@ module arm (
 	output wire ForwardA;
 	output wire ForwardB;
 
-	wire RegWriteW;
+	output wire RegWriteW;
     wire RegWriteM;
     wire MemToRegE;  
     wire Match_1E_M;
@@ -178,7 +179,8 @@ module arm (
 		.MUpD(Instr[23]),
 		.MByteD(Instr[22]),
 		.MWriteBackD(Instr[21]),
-		.MLoadD(Instr[20])
+		.MLoadD(Instr[20]),
+		.Result2W(Result2W)
 	);
 
 	hazardunit hz(
