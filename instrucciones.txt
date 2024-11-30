@@ -1,0 +1,22 @@
+mov r0, #0
+	mov r1, #4
+	mov r6, #6
+	loop:
+	cmp r1, r0
+	beq end
+	sub r1, r1, #1
+	b loop
+	end:
+	mov r2, #2
+
+RAM[0] = 32'he3a00000; 
+RAM[1] = 32'he3a01004;
+RAM[2] = 32'he3a06006;
+RAM[3] = 32'he1510000;
+RAM[4] = 32'h0a000001;
+RAM[5] = 32'he2411001;
+RAM[6] = 32'heafffffb;
+RAM[7] = 32'he3a02002;
+
+------------------------------
+
