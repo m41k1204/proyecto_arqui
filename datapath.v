@@ -66,7 +66,8 @@ module datapath (
 	MByteD,
 	MWriteBackD,
 	MLoadD,
-	ResultW
+	ResultW,
+	Result2W
 );
 	input wire clk;
 	input wire reset;
@@ -152,7 +153,7 @@ module datapath (
 	wire [3:0] WA0W;
 	wire [31:0] RD3;
 	wire [31:0] RD0;
-	wire [31:0] Result2W;
+	output wire [31:0] Result2W;
 	wire [31:0] ALUResult2E;
 	wire [31:0] SrcCE;
 	wire [31:0] SrcDE;

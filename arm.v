@@ -10,7 +10,11 @@ module arm (
 	ALUResult,
 	WriteData,
 	ReadData,
-	ResultW
+	ResultW,
+	Result2W,
+	BranchTakenE,
+	ForwardA,
+	ForwardB
 );
 	input wire clk;
 	input wire reset;
@@ -27,8 +31,12 @@ module arm (
 	wire [1:0] RegSrc;
 	wire [1:0] ImmSrc;
 	wire [3:0] ALUControl;
+	output wire BranchTakenE;
 	
 	output wire [31:0] ResultW;
+	output wire [31:0] Result2W;
+	output wire ForwardA;
+	output wire ForwardB;
 
 	wire RegWriteW;
     wire RegWriteM;
@@ -210,6 +218,8 @@ module arm (
     	.StallF(StallF),
     	.StallD(StallD),
     	.FlushE(FlushE),
-		.FlushD(FlushD)
+		.FlushD(FlushD),
+		.ForwardA(ForwardA),
+		.ForwardB(ForwardB)
 	);
 endmodule

@@ -9,7 +9,11 @@ module top (
 	DataAdr,
 	MemWriteM,
 	ResultW,
-	PC
+	PC,
+	Result2W,
+	BranchTakenE,
+	ForwardA,
+	ForwardB
 );
 	input wire clk;
 	input wire reset;
@@ -20,6 +24,10 @@ module top (
 	wire [31:0] Instr;
 	wire [31:0] ReadData;
 	output wire [31:0] ResultW;
+	output wire [31:0] Result2W;
+	output wire BranchTakenE;
+	output wire ForwardA;
+	output wire ForwardB;
 	arm arm(
 		.clk(clk),
 		.reset(reset),
@@ -29,7 +37,11 @@ module top (
 		.ALUResult(DataAdr),
 		.WriteData(WriteData),
 		.ReadData(ReadData),
-		.ResultW(ResultW)
+		.ResultW(ResultW),
+		.Result2W(Result2W),
+		.BranchTakenE(BranchTakenE),
+		.ForwardA(ForwardA),
+		.ForwardB(ForwardB)
 	);
 	imem imem(
 		.a(PC),

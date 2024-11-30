@@ -37,7 +37,9 @@ module hazardunit(
     output wire StallF,
     output wire StallD,
     output wire FlushE,
-    output wire FlushD
+    output wire FlushD,
+    output wire ForwardA,
+    output wire ForwardB
 );
 
 wire LDRstall;
@@ -49,6 +51,9 @@ assign StallF = reset ? 1'b0 : ~(LDRstall || PCWrPendingF);
 assign StallD = reset ? 1'b0 : ~LDRstall;
 assign FlushE = reset ? 1'b0 : (LDRstall || BranchTakenE);
 assign FlushD = reset ? 1'b0 : (PCWrPendingF || PCSrcW || BranchTakenE);
+assign ForwardA = (ForwardAE[0] || ForwardAE[1] || ForwardAE[2]);
+assign ForwardB = (ForwardBE[0] || ForwardAE[1] || ForwardAE[2]);
+
 
 always @(*) begin
     if (Match_1E_M & RegWriteM)         
