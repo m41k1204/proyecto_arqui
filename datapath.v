@@ -59,7 +59,6 @@ module datapath (
 	Saturated,
 	Negate,
 	Unsigned,
-	Long,
 	NoShift,
 	MImmediateD,
 	MPreindexD,
@@ -118,7 +117,6 @@ module datapath (
 	input wire Saturated;
 	input wire Negate;
 	input wire Unsigned;
-	input wire Long;
 	input wire NoShift;
 
 	input wire MImmediateD;
@@ -456,7 +454,6 @@ module datapath (
 		.Saturated(Saturated),
 		.Negate(Negate),
 		.Unsigned(Unsigned),
-		.Long(Long),
 		.Result(ALURes),
 		.Result2(ALUResult2E),
 		.ALUFlags(ALUFlags)
