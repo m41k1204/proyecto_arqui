@@ -34,7 +34,8 @@ module controller (
 	NoShiftE,
 	RegWrite2M,
 	RegWrite2W,
-	CarryFlag
+	CarryFlag,
+	Reg2WE
 );
 	input wire clk;
 	input wire reset;
@@ -43,7 +44,7 @@ module controller (
 	input wire StallD;
 	input wire FlushD;
 	input wire FlushE;
-	output wire [1:0] RegSrc;
+	output wire [2:0] RegSrc;
 	output wire [1:0] ImmSrc;
 	wire ALUSrc;
 	wire [3:0] ALUControl;
@@ -87,6 +88,11 @@ module controller (
 	output wire LongE;
 	output wire NoShiftE;
 
+	wire Reg2W;
+	output wire Reg2WE;
+	wire PreIndexD;
+	output wire PreIndexE;
+
 	output wire PCSrcM;
 	output wire RegWriteM;
 	wire MemToRegM;
@@ -102,8 +108,8 @@ module controller (
 
 	output wire CarryFlag;
 
-	wire [28:0] OutputDecode;
-	wire [28:0] InputExecute;
+	wire [30:0] OutputDecode;
+	wire [30:0] InputExecute;
 	wire [4:0] OutputExecute;
 	wire [4:0] InputMemory;
 	wire [3:0] OutputMemory;
@@ -141,7 +147,9 @@ module controller (
 		.Negate(NegateD),
 		.Unsigned(UnsignedD),
 		.Long(LongD),
-		.NoShift(NoShiftD)
+		.NoShift(NoShiftD),
+		.Reg2W(Reg2W),
+		.PreIndex(PreIndexD)
 	);
 
 	assign OutputDecode [0] = PCSrcD;
@@ -162,8 +170,10 @@ module controller (
 	assign OutputDecode [26] = UnsignedD;
 	assign OutputDecode [27] = LongD;
 	assign OutputDecode [28] = NoShiftD;
+	assign OutputDecode [29] = Reg2W;
+	assign OutputDecode [30] = PreIndexD;
 	
-	ff1to1 #(29) DecodeToExecuteReg(
+	ff1to1 #(31) DecodeToExecuteReg(
 		.i(OutputDecode),
 		.j(InputExecute),
 		.clk(clk),
@@ -190,13 +200,15 @@ module controller (
 	assign UnsignedE = InputExecute[26];
 	assign LongE = InputExecute[27];
 	assign NoShiftE = InputExecute[28];
+	assign Reg2WE = InputExecute[29];
+	assign PreIndexE = InputExecute[30];
 
 	assign BranchTakenE = (BranchE & CondExE);
 	assign OutputExecute[0] = (PCSrcE & CondExE);
 	assign OutputExecute[1] = RegWriteE & CondExE & ~NoWriteE;
 	assign OutputExecute[2] = MemToRegE;
 	assign OutputExecute[3] = MemWriteE & CondExE;
-	assign OutputExecute[4] = LongE & CondExE;
+	assign OutputExecute[4] = (LongE | Reg2WE) & CondExE;
 
 	ff1to1 #(5) ExecuteToMemoryReg(
 		.i(OutputExecute),

@@ -61,18 +61,14 @@ module datapath (
 	Unsigned,
 	Long,
 	NoShift,
-	MImmediateD,
-	MPreindexD,
-	MUpD,
-	MByteD,
-	MWriteBackD,
-	MLoadD,
+	Reg2W,
+	PreIndex,
 	ResultW,
 	Result2W
 );
 	input wire clk;
 	input wire reset;
-	input wire [1:0] RegSrc;
+	input wire [2:0] RegSrc;
 	input wire RegWrite;
 	input wire RegWrite2W;
 	input wire [1:0] ImmSrc;
@@ -121,12 +117,8 @@ module datapath (
 	input wire Long;
 	input wire NoShift;
 
-	input wire MImmediateD;
-	input wire MPreindexD;
-	input wire MUpD;
-	input wire MByteD;
-	input wire MWriteBackD;
-	input wire MLoadD;
+	input wire Reg2W;
+	input wire PreIndex;
 	
 	output wire Match_1E_M;
     output wire Match_1E_W;
@@ -172,6 +164,8 @@ module datapath (
 	wire [31:0] ALUResultE;
 	wire [31:0] ALURes;
 
+	wire [31:0] ALUFinalResultE;
+
 	wire [1:0] ShiftTypeE;
 	wire ShiftSourceE;
 	wire [4:0] ShiftImmediateE;
@@ -183,6 +177,7 @@ module datapath (
 	wire [3:0] WA3M;
 	wire [3:0] WA0E;
 	wire [3:0] WA0M;
+	wire [3:0] WA0D;
 	
 	wire [31:0] ALUOut2M;
 
@@ -209,7 +204,7 @@ module datapath (
 	assign OutputDecode[107:104] = RA2;
 	assign OutputDecode[139:108] = RD0;
 	assign OutputDecode[171:140] = RD3;
-	assign OutputDecode[175:172] = InstrD[11:8];
+	assign OutputDecode[175:172] = WA0D;
 	assign OutputDecode[177:176] = InstrD[6:5];
 	assign OutputDecode[178] = InstrD[4];
 	assign OutputDecode[183:179] = InstrD[11:7];
@@ -258,8 +253,8 @@ module datapath (
 	// logica para el Match Signaling del Stalling
 	assign Match_12D_E = (RA1 == WA3E) || (RA2 == WA3E);
 	
-	assign OutputExecute[31:0] = ALUResultE;
-	assign OutputExecute[63:32] = WriteDataE;
+	assign OutputExecute[31:0] = ALUFinalResultE; //
+	assign OutputExecute[63:32] = SrcDE; // aca iria SrcDE creo
 	assign OutputExecute[67:64] = InputExecute[99:96];
 	assign OutputExecute[99:68] = ALUResult2E;
 	assign OutputExecute[103:100] = WA0E;
@@ -337,6 +332,20 @@ module datapath (
 		.d1(InstrD[15:12]),
 		.s(RegSrc[1]),
 		.y(RA2)
+	);
+
+	mux2 #(4) rwdmux(
+		.d0(InstrD[11:8]),
+		.d1(InstrD[19:16]),
+		.s(RegSrc[2]),
+		.y(WA0D)
+	);
+
+	mux2 #(32) preindexmux(
+		.d0(ALUResultE),
+		.d1(ALUResult2E),
+		.s(PreIndex),
+		.y(ALUFinalResultE)
 	);
 	
 	//assign WA3W = 4'b0010;
@@ -457,8 +466,9 @@ module datapath (
 		.Negate(Negate),
 		.Unsigned(Unsigned),
 		.Long(Long),
-		.Result(ALURes),
-		.Result2(ALUResult2E),
+		.Memory(Reg2W),
+		.FinalResult(ALURes),
+		.FinalResult2(ALUResult2E),
 		.ALUFlags(ALUFlags)
 	);
 endmodule
