@@ -11,8 +11,6 @@ module imem (
         RAM[1] = 32'he3a02005;
         RAM[2] = 32'he3a04007;
         RAM[3] = 32'hec203402;
-        
-
 
 	   end
 	   

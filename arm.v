@@ -78,6 +78,7 @@ module arm (
 	wire Saturated;
 	wire Negate;
 	wire Unsigned;
+	wire Long;
 	wire NoShift;
 
 	wire PCSrcD;
@@ -116,6 +117,7 @@ module arm (
 		.SaturatedE(Saturated),
 		.NegateE(Negate),
 		.UnsignedE(Unsigned),
+		.LongE(Long),
 		.NoShiftE(NoShift),
 		.RegWrite2W(RegWrite2W),
 		.RegWrite2M(RegWrite2M),
@@ -173,6 +175,7 @@ module arm (
 		.Saturated(Saturated),
 		.Negate(Negate),
 		.Unsigned(Unsigned),
+		.Long(Long),
 		.NoShift(NoShift),
 		.MImmediateD(Instr[25]),
 		.MPreindexD(Instr[24]),
