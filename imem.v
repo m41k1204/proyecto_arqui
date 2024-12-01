@@ -7,7 +7,7 @@ module imem (
 	reg [31:0] RAM [63:0];
 	
 	initial begin 
-	    RAM[0] = 32'he3a02014;
+RAM[0] = 32'he3a02014;
 RAM[1] = 32'he3a04009;
 RAM[2] = 32'he3a05008;
 RAM[3] = 32'hEC049005;
@@ -31,6 +31,10 @@ RAM[20] = 32'hECA4010C;
 RAM[21] = 32'he3a02001;
 RAM[22] = 32'he3a03003;
 RAM[23] = 32'hECC4230C;
+
+
+
+
 
 
 	   end

@@ -12,19 +12,19 @@ module demo (
 
 );
 
-    wire [31:0] ResultW;   // Result from processor
+    wire [31:0] ResultW;   
     wire WriteData, DataAdr, MemWriteM;
     wire internal_clk;
     wire [31:0] PC;
 
-    // Clock divider for internal FSM clock
+    
     clk_divider_internal internal_clk_divider (
         .clk(clk),
         .rst(rst),
         .led(internal_clk)
     );
 
-    // Pipelined processor
+    
     top top (
         .clk(real_clk),
         .reset(rst),
@@ -41,7 +41,7 @@ module demo (
         
     );
 
-    // Basys decoder with FSM
+    
     basysdecoder decoder (
         .out0(out),
         .enable(enable),
@@ -51,7 +51,7 @@ module demo (
         .PC(PC[7:0])
     );
 
-    // Real clock for processor
+   
     clk_divider clk_divider (
         .clk(clk),
         .rst(rst),

@@ -17,11 +17,9 @@ module basysdecoder (
     parameter S2 = 2'b10;       
     parameter S3 = 2'b11;       
 
-    // Reset the state to S0 on real_clk
     
-    // State transitions on internal_clk (only if real_clk is not active)
     always @(posedge internal_clk) begin
-        begin  // Ensure state only changes on internal_clk, not on real_clk
+        begin  
             case (state)
                 S0: begin 
                     state <= S1;
@@ -43,7 +41,6 @@ module basysdecoder (
         end
     end
 
-    // Determine the output digit based on the current state
     always @(*) begin
         case (state)
             S1: digito = ResultW[3:0];    
@@ -54,7 +51,6 @@ module basysdecoder (
         endcase
     end
 
-    // Display the 7-segment values based on the current digit
     always @(*) begin
         case (digito)
             4'b0000: out0 = 7'b0000001; // 0
@@ -73,7 +69,7 @@ module basysdecoder (
             4'b1101: out0 = 7'b1000010; // d
             4'b1110: out0 = 7'b0110000; // E
             4'b1111: out0 = 7'b0111000; // F
-            default: out0 = 7'b1111111; // Default (all segments off)
+            default: out0 = 7'b1111111; 
         endcase
     end
 
