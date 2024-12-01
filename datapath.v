@@ -59,7 +59,6 @@ module datapath (
 	Saturated,
 	Negate,
 	Unsigned,
-	Long,
 	NoShift,
 	Reg2W,
 	PreIndex,
@@ -114,7 +113,6 @@ module datapath (
 	input wire Saturated;
 	input wire Negate;
 	input wire Unsigned;
-	input wire Long;
 	input wire NoShift;
 
 	input wire Reg2W;
@@ -469,6 +467,8 @@ module datapath (
 		.Memory(Reg2W),
 		.FinalResult(ALURes),
 		.FinalResult2(ALUResult2E),
+		.Result(ALURes),
+		.Result2(ALUResult2E),
 		.ALUFlags(ALUFlags)
 	);
 endmodule
