@@ -79,26 +79,26 @@ always @(*) begin
         ForwardBE = 3'b000;
 
     if (Match_3E_M & RegWriteM)         
-        ForwardCE = 3'b010;
-    else if (Match_3E_W & RegWriteW)    
-        ForwardCE = 3'b001;
-    else if (Match_3E_M0 & RegWrite2M)    
-        ForwardCE = 3'b011;
-    else if (Match_3E_W0 & RegWrite2W)    
-        ForwardCE = 3'b100;
-    else                                
-        ForwardCE = 3'b000;
-
-    if (Match_0E_M & RegWriteM)         
         ForwardDE = 3'b010;
-    else if (Match_0E_W & RegWriteW)    
+    else if (Match_3E_W & RegWriteW)    
         ForwardDE = 3'b001;
-    else if (Match_0E_M0 & RegWrite2M)    
+    else if (Match_3E_M0 & RegWrite2M)    
         ForwardDE = 3'b011;
-    else if (Match_0E_W0 & RegWrite2W)    
+    else if (Match_3E_W0 & RegWrite2W)    
         ForwardDE = 3'b100;
     else                                
         ForwardDE = 3'b000;
+
+    if (Match_0E_M & RegWriteM)         
+        ForwardCE = 3'b010;
+    else if (Match_0E_W & RegWriteW)    
+        ForwardCE = 3'b001;
+    else if (Match_0E_M0 & RegWrite2M)    
+        ForwardCE = 3'b011;
+    else if (Match_0E_W0 & RegWrite2W)    
+        ForwardCE = 3'b100;
+    else                                
+        ForwardCE = 3'b000;
 
 end
 
