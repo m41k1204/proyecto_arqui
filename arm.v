@@ -29,7 +29,7 @@ module arm (
 	wire RegWrite;
 	wire ALUSrc;
 	wire MemtoReg;
-	wire [1:0] RegSrc;
+	wire [2:0] RegSrc;
 	wire [1:0] ImmSrc;
 	wire [3:0] ALUControl;
 	output wire BranchTakenE;
@@ -79,6 +79,9 @@ module arm (
 	wire Unsigned;
 	wire Long;
 	wire NoShift;
+	
+	wire Reg2W;
+	wire PreIndex;
 
 	wire PCSrcD;
 	wire PCSrcE;
@@ -87,6 +90,7 @@ module arm (
 
 	wire RegWrite2M;
 	wire RegWrite2W;
+	wire Reg2WE;
 
 	controller c(
 		.clk(clk),
@@ -120,7 +124,9 @@ module arm (
 		.NoShiftE(NoShift),
 		.RegWrite2W(RegWrite2W),
 		.RegWrite2M(RegWrite2M),
-		.CarryFlag(CarryFlag)
+		.CarryFlag(CarryFlag),
+		.Reg2WE(Reg2WE),
+		.PreIndexE(PreIndex)
 	);
 
 	datapath dp(
@@ -176,12 +182,8 @@ module arm (
 		.Unsigned(Unsigned),
 		.Long(Long),
 		.NoShift(NoShift),
-		.MImmediateD(Instr[25]),
-		.MPreindexD(Instr[24]),
-		.MUpD(Instr[23]),
-		.MByteD(Instr[22]),
-		.MWriteBackD(Instr[21]),
-		.MLoadD(Instr[20]),
+		.Reg2W(Reg2WE),
+		.PreIndex(PreIndex),
 		.Result2W(Result2W)
 	);
 

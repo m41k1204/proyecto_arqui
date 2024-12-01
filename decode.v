@@ -19,7 +19,9 @@ module decode (
 	Negate,
 	Unsigned,
 	Long,
-	NoShift
+	NoShift,
+	Reg2W,
+	PreIndex
 );
 	input wire [1:0] Op;
 	input wire [5:0] Funct;
@@ -31,7 +33,7 @@ module decode (
 	output wire MemtoReg;
 	output wire ALUSrc;
 	output wire [1:0] ImmSrc;
-	output wire [1:0] RegSrc;
+	output wire [2:0] RegSrc;
 	output reg [3:0] ALUControl;
 	output wire Carry;
 	output wire NoWrite;
@@ -42,25 +44,37 @@ module decode (
 	output wire Long;
 	output wire NoShift;
 
-	reg [9:0] controls;
+	reg [12:0] controls;
 	output wire Branch;
+	output wire Reg2W;
+	output wire PreIndex;
+
 	wire ALUOp;
 	always @(*)
 		casex (Op)
-			2'b00 , 2'b11:
+			2'b00, 2'b11:
 				if (Funct[5])
-					controls = 10'b0000101001;
+					controls = 13'b0000010100100;
 				else
-					controls = 10'b0000001001;
+					controls = 13'b0000000100100;
 			2'b01:
-				if (Funct[0])
-					controls = 10'b0001111000;
-				else
-					controls = 10'b1001110100;
-			2'b10: controls = 10'b0110100010;
-			default: controls = 10'bxxxxxxxxxx;
+			begin
+				controls[12:10] = 3'b100;
+				controls[9:8] = Funct[5] ? 2'bxx : 2'b01;
+				controls[7] = ~Funct[5];
+				controls[6] = Funct[0];
+				controls[5] = Funct[0];
+				controls[4] = ~Funct[0];
+				controls[3] = 1'b0;
+				controls[2] = 1'b0;
+				controls[1] = Funct[1] | ~Funct[4];
+				controls[0] = Funct[1];
+			end
+
+			2'b10: controls = 13'b0011010001000;
+			default: controls = 13'bxxxxxxxxxxxxx;
 		endcase
-	assign {RegSrc, ImmSrc, ALUSrc, MemtoReg, RegW, MemW, Branch, ALUOp} = controls;
+	assign {RegSrc, ImmSrc, ALUSrc, MemtoReg, RegW, MemW, Branch, ALUOp, Reg2W, PreIndex} = controls;
 
 	assign Carry = (Op == 2'b00) & (Funct[4:1] == 4'b0101 | Funct[4:1] == 4'b0110 | Funct[4:1] == 4'b0111);
 	assign NoWrite = (Op == 2'b00) & (Funct[4:0] == 5'b10001 | Funct[4:0] == 5'b10011 | Funct[4:1] == 4'b1010 | Funct[4:1] == 4'b1011);
@@ -146,13 +160,19 @@ module decode (
 				endcase
 			end
 
-
 			FlagW[1] = Op == 2'b00 & Funct[0];
 			FlagW[0] = Op == 2'b00 & Funct[0] & ALUControl != 4'b0010 & ALUControl != 4'b0011 & ALUControl != 4'b0100;
 		end
 		else begin
-			ALUControl = 4'b0000;
 			FlagW = 2'b00;
+			if (Op == 2'b01) begin
+				if(Funct[3])
+					ALUControl = 4'b0000;
+				else
+					ALUControl = 4'b0001;
+			end
+			else
+				ALUControl = 4'b0000;
 		end
 	assign PCS = ((Rd == 4'b1111) & RegW) | Branch;
 endmodule
