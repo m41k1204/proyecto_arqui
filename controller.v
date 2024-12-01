@@ -35,7 +35,8 @@ module controller (
 	RegWrite2M,
 	RegWrite2W,
 	CarryFlag,
-	Reg2WE
+	Reg2WE,
+	PreIndexE
 );
 	input wire clk;
 	input wire reset;
