@@ -67,7 +67,6 @@ module arm (
     wire StallF;
     wire StallD;
     wire FlushE;
-	wire BranchTakenE;
 	wire FlushD;
 
 	wire CarryFlag;
